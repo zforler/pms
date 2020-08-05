@@ -18,8 +18,14 @@ const router = new VueRouter({
     { path: '',
       component: Layout,
       children: [
-        { path: '/a1', component: ViewA },
-        { path: '/b/b', component: ViewB }
+        {
+          text: '菜单一',
+          path: '/a1',
+          component: ViewA },
+        {
+          text: '菜单二',
+          path: '/b1',
+          component: ViewB }
       ]
     }
   ]

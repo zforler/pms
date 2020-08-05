@@ -4,6 +4,13 @@ $bg-color:#F8F9FC;
 $bg-color-rgba:rgb(248,249,252);
 $h-100vh:100vh;
 
+ul{
+  margin: 0;
+  padding: 0;
+}
+li{
+  list-style: none;
+}
 
 .l-flex-center{
   display: flex;
