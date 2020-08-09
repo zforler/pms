@@ -1,6 +1,8 @@
 #LMenu{
     list-style: none;
     padding: 0;
+    overflow: auto;
+    height: calc(100vh - 75px);
 }
 .L-item{
     display: block;
@@ -8,8 +10,9 @@
     height: 0px;
     line-height: 0px;
     overflow: hidden;
-    background-color: #f0f0f0;
+    background-color: transparent;
     transition: all 0.1s;
+    color:#fff;
 }
 .L-item > .L-item-c{
     display: inline-block;
@@ -18,9 +21,12 @@
     display: none;
 }
 .L-item-extend{
-    height: 45px;
-    line-height: 45px;
+    height: 56px;
+    line-height: 56px;
     transition: all 0.1s;
+}
+.L-item-open{
+    background-color: #3b5998 !important;
 }
 .L-item-open > .L-item-c{
     display: none;
@@ -28,10 +34,15 @@
 .L-item-open > .L-item-o{
     display: inline-block;
 }
-
+.L-item-active{
+    background-color: #3b5998 !important;
+}
+/***第一层级样式***/
 .L-item[data-level='1']{
-    background-color: #ccc;
+    background-color: transparent;
     display: block;
-    height: 45px;
-    line-height: 45px;
+    height: 56px;
+    line-height: 56px;
+    color:#fff;
+    border-bottom: rgba(255,255,255,0.15) 1px solid;
 }

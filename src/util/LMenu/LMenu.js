@@ -18,7 +18,7 @@ class LMenu {
         this.elInnerContainer = document.querySelector('#LMenu')
         this.elInnerContainer.addEventListener('click',(e)=>{
             let target = e.target
-            if(target.dataset.type == 'item'){
+            if(target.dataset.type){
                 let id = target.dataset.id
                 //执行监听的click方法
                 if(me.event.click instanceof Function){
@@ -50,6 +50,10 @@ class LMenu {
             for (let i = 0, len = childs.length; i < len; i++) {
                 this.flodUp(childs[i].dataset.id)
                 childs[i].classList.remove('L-item-extend')
+                console.log(childs[i].dataset.type)
+                if(childs[i].dataset.type == LMenu.MENU_TYPE.MENU){
+                    childs[i].classList.remove('L-item-open')
+                }
             }
             this.flatMenuCache.get(id).extend = false
         }
@@ -70,10 +74,10 @@ class LMenu {
         let frag = document.createDocumentFragment();
         console.log(this.flatMenuCache)
         for (let [key,value] of this.flatMenuCache){
-            console.log(key)
             let item = document.createElement('li')
-            item.innerText = value.text
-            item.dataset.type= 'item'
+            item.innerText = value.name
+            item.id = value._id
+            item.dataset.type= value.type
             item.dataset.level= value._level
             item.dataset.id= value._id
             item.dataset.parentId= value._parentId
@@ -132,6 +136,19 @@ class LMenu {
     addMenu(){
 
     }
+    setActive(value, type='path') {
+        console.log('aaa',this.menuElementCache)
+        for(let [key, val] of this.flatMenuCache){
+            if(val[type] == value){
+                let active = document.querySelector('.L-item-active')
+                if(active){
+                    active.classList.remove('L-item-active')
+                }
+                document.getElementById(val._id).classList.add("L-item-active")
+                break
+            }
+        }
+    }
 }
 
 // let lmenu = new LMenu({
@@ -187,4 +204,8 @@ class LMenu {
 // lmenu.on('click', function (e) {
 //     console.log(e)
 // })
+LMenu.MENU_TYPE={
+    MENU: 1,
+    ITEM: 2,
+}
 export default LMenu

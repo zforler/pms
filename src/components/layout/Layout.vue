@@ -2,21 +2,25 @@
   <div>
     <div class="l-left-container">
       <div class="l-left-logo l-flex-center">PMS</div>
-      <div @click="view('a1')">a</div>
-      <div @click="view('b1')">b</div>
-      <div id="menuc">c</div>
-
+      <div id="menuc"></div>
     </div>
     <div class="l-right-container">
-      <div class="l-right-top">top</div>
-      <div class="l-tab-container">
-        <ul class="l-tab">
-          <li>菜单一</li>
-          <li>菜单二</li>
-        </ul>
+      <div class="l-right-top">
+        <div class="l-right-top-company">
+          <h2>xxxgong公司</h2>
+        </div>
+        <div class="l-right-top-user-c">
+          <div class="l-right-top-user" @click="userClick">系统管理员</div>
+          <ul :class="userOperation?'l-right-top-user-opetion' : 'l-right-top-user-opetion-show'">
+            <li class="l-rtuo-item">退出</li>
+          </ul>
+        </div>
       </div>
-      <div class="l-right-bcontainer">
-        <router-view></router-view>
+      <div class="l-right-content">
+        <LTabs></LTabs>
+        <div class="l-right-bcontainer">
+          <TabVIews></TabVIews>
+        </div>
       </div>
     </div>
   </div>
@@ -24,16 +28,35 @@
 
 <script>
 import LMenu from "@/util/LMenu/LMenu";
+import LTabs from "@/components/layout/LTabs";
+import TabVIews from "@/components/layout/TabVIews";
 export default {
 name: "Layout",
   data() {
     return {
-      lmenu: ''
+      lmenu: '',
+      userOperation: false,
     }
+  },
+  components:{
+    LTabs,
+    TabVIews
+  },
+  watch: {
+    $route(to, from) {
+      // 对路由变化作出响应...
+      this.lmenu.setActive(to.path)
+    }
+  },
+  activated() {
+    this.lmenu.setActive(this.$router.currentRoute.path)
   },
   methods: {
     view(mark){
       this.$router.push('/' + mark)
+    },
+    userClick() {
+      this.userOperation = !this.userOperation
     }
   },
   mounted() {
@@ -85,10 +108,13 @@ name: "Layout",
     //         text: 'title4'
     //     }
     // ]
-    this.lmenu.render(this.$router.options.routes[0].children)
-    this.lmenu.on('click', function (e) {
+    this.lmenu.render(this.$router.options.routes)
+    this.lmenu.on('click', (e) => {
         console.log(e)
       if(!e.path){
+        return
+      }
+      if(e.type == 1){
         return
       }
       if(e.path === me.$router.currentRoute.path){
@@ -96,16 +122,20 @@ name: "Layout",
       }
       console.log(me.$router.currentRoute)
       me.$router.push(e.path)
+      this.lmenu.setActive(e.path)
     })
   }
 }
 </script>
 
 <style lang="scss" scoped>
-@import "../styles/common.scss";
-@import "../util/LMenu/LMenu.css";
+@import "../../styles/common";
+@import "../../util/LMenu/LMenu.css";
+
   .l-left-container{
     background-color: $theme-color;
+    background-image: linear-gradient(180deg,#4e73df 10%,#224abe 100%);
+    background-size: cover;
     width: 300px;
     float: left;
     height: $h-100vh;
@@ -120,11 +150,50 @@ name: "Layout",
     height: $h-100vh;
   }
   .l-right-top{
-    padding: 15px;
+    padding: 15px 25px;
     height: 75px;
     background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
+
   .l-right-bcontainer{
-    padding: 15px;
+    padding: 25px;
   }
+  .l-right-content {
+    padding: 25px;
+  }
+.l-right-bcontainer {
+  background-color: #fff;
+  min-height: calc(100vh - 176px);
+}
+/*用户信息*/
+.l-right-top-user-c {
+  position: relative;
+}
+.l-right-top-user{
+  cursor: pointer;
+}
+.l-right-top-user-opetion {
+  position: absolute;
+  top: calc(100% + 27px);
+  background-color: #ccc;
+  width: 110px;
+  min-height: 85px;
+  left: -35px;
+  border-radius: 5px;
+  background-color: #fff;
+  border: #ccc thin solid;
+  display: block;
+}
+.l-right-top-user-opetion-show{
+  display: none;
+}
+.l-rtuo-item{
+  text-align: center;
+  cursor: pointer;
+  padding: 8px 0;
+}
+/*用户信息*/
 </style>
