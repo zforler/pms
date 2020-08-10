@@ -1,23 +1,40 @@
 <template>
   <div class="customer-container">
-    客户管理
+    <div class="t-top-bar">
+
+    </div>
     <el-table
         :data="tableData"
         border
         style="width: 100%">
       <el-table-column
           prop="date"
-          label="日期"
+          label="客户编号"
           width="180">
       </el-table-column>
       <el-table-column
           prop="name"
-          label="姓名"
+          label="公司名称"
           width="180">
       </el-table-column>
       <el-table-column
           prop="address"
-          label="地址">
+          label="公司地址">
+      </el-table-column>
+      <el-table-column
+              prop="address"
+              label="公司负责人">
+      </el-table-column>
+      <el-table-column
+              prop="address"
+              label="联系方式">
+      </el-table-column>
+      <el-table-column
+              prop="address"
+              label="对接人">
+      </el-table-column>
+      <el-table-column
+              label="操作">
       </el-table-column>
     </el-table>
   </div>
