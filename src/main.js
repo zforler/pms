@@ -2,13 +2,22 @@ import Vue from 'vue'
 import VueRouter from "vue-router";
 import App from './App.vue'
 import Layout from "@/components/layout/Layout";
-import {Table,TableColumn} from "element-ui";
+import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree} from "element-ui";
 
 Vue.config.productionTip = false
 
 Vue.use(VueRouter)
 Vue.use(Table)
 Vue.use(TableColumn)
+Vue.use(Button)
+Vue.use(Select)
+Vue.use(Input)
+Vue.use(Option)
+Vue.use(Dialog)
+Vue.use(Form)
+Vue.use(FormItem)
+Vue.use(Pagination)
+Vue.use(Tree)
 
 const temp = {
   template: `<router-view></router-view>`
@@ -16,32 +25,6 @@ const temp = {
 const router = new VueRouter({
   // scrollBehavior: () => ({ y: 0 }),
   routes: [
-      {
-        name: '菜单一',
-        path: '/',
-        component: Layout,
-        type: 1,
-        children: [
-          {
-            name: '菜单一',
-            path: '/a1/a11',
-            type: 2,
-            component: () => import('./components/ViewA1.vue') },
-          {
-            name: '菜单二',
-            path: '/b11',
-            component: () => import('./components/ViewT.vue'),
-            type: 1,
-            children: [
-              {
-                name: '菜单二',
-                path: '/b11/b11',
-                type: 2,
-                component: () => import('./components/customer/customer.vue'), }
-            ]
-          }
-        ]
-      },
       {
         name: '客户管理',
         path: '/',

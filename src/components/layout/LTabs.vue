@@ -16,23 +16,6 @@ export default {
   data() {
     return {
       tabItems: [
-        {
-          text: '菜单一',
-          path: '/a1/a11',
-          active: true
-        },
-        {
-          text: '菜单二',
-          path: '/b11/b11'
-        },
-        {
-          text: '菜单三',
-          path: '/a1'
-        },
-        {
-          text: '菜单四#f8f9fc',
-          path: '/b1'
-        }
       ],
       activeItem: ''
     }
@@ -56,12 +39,22 @@ export default {
     }
   },
   mounted() {
+    let currentRoute = this.$router.currentRoute
+    let item = {
+      text: currentRoute.name,
+      path: currentRoute.path,
+      active: true
+    }
+    this.pushItem(item)
+
     for (let i = 0, len = this.tabItems.length; i < len; i++) {
       if(this.tabItems[i].active){
         this.activeItem = this.tabItems[i]
         break
       }
     }
+
+
   },
   methods: {
     pushItem(item) {

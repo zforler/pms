@@ -26,3 +26,27 @@ li{
   align-items: center;
 }
 
+/*element-ui*/
+.el-dialog__footer{
+  text-align: center;
+}
+
+.el-table th{
+  text-align: center;
+}
+.el-table .cell {
+  text-align: center;
+}
+.el-icon-table{
+  font-size: 20px;
+  cursor: pointer;
+  margin-right: 8px;
+}
+.l-add-buttion{
+  font-size: 35px;
+  cursor: pointer;
+}
+.el-pagination{
+  text-align: right;
+  padding: 15px 0;
+}
