@@ -103,8 +103,6 @@ export default {
 @import "../../styles/common.scss";
 @import "../../styles/ltab.scss";
 .l-tab-container {
-  background-color:$bg-color-tab;
-  border-bottom: thin solid #ccc;
-
+  background-color:$theme-color;
 }
 </style>

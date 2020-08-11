@@ -16,6 +16,9 @@
 }
 .L-item > .L-item-c{
     display: inline-block;
+    float: right;
+    margin-right: 15px;
+    line-height: unset;
 }
 .L-item > .L-item-o{
     display: none;
@@ -33,6 +36,9 @@
 }
 .L-item-open > .L-item-o{
     display: inline-block;
+    float: right;
+    margin-right: 15px;
+    line-height: unset;
 }
 .L-item-active{
     background-color: #3b5998 !important;

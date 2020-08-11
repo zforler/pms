@@ -59,13 +59,11 @@ class LMenu {
         }
     }
     appendRightIcon(element){
-        let span1 = document.createElement('span');
-        span1.className = 'L-item-c'
-        span1.innerText = '>'
+        let span1 = document.createElement('i');
+        span1.className = 'el-icon-arrow-right L-item-c'
         element.appendChild(span1)
-        let span2 = document.createElement('span');
-        span2.className = 'L-item-o'
-        span2.innerText = '∨'
+        let span2 = document.createElement('i');
+        span2.className = 'el-icon-arrow-down L-item-o'
         element.appendChild(span2)
 
     }

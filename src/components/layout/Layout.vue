@@ -136,7 +136,7 @@ name: "Layout",
     background-color: $theme-color;
     background-image: linear-gradient(180deg,#4e73df 10%,#224abe 100%);
     background-size: cover;
-    width: 300px;
+    width: $menu-width;
     float: left;
     height: $h-100vh;
   }
@@ -145,7 +145,7 @@ name: "Layout",
   }
   .l-right-container{
     background-color: $bg-color;
-    width: calc(100% - 300px);
+    width: calc(100% - 250px);
     float: left;
     height: $h-100vh;
   }
