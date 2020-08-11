@@ -7,18 +7,21 @@
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="date" label="员工编号" width="80"></el-table-column>
-      <el-table-column prop="name" label="员工姓名" width="180"></el-table-column>
+      <el-table-column prop="date" label="用户编号" width="80"></el-table-column>
+      <el-table-column prop="name" label="用户名"></el-table-column>
+      <el-table-column prop="name" label="用户姓名" width="180"></el-table-column>
       <el-table-column prop="address" label="性别" width="230"></el-table-column>
       <el-table-column prop="name" label="联系方式"></el-table-column>
-      <el-table-column prop="name" label="员工住址"></el-table-column>
-      <el-table-column prop="name" label="身份证号"></el-table-column>
       <el-table-column prop="name" label="添加时间"></el-table-column>
       <el-table-column prop="name" label="修改时间"></el-table-column>
+      <el-table-column prop="name" label="用户角色"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
           <i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>
+          <i class="el-icon-setting el-icon-table" @click="setRoleHandler(scope.row)"></i>
+          <i v-if="scope.row.status==0" class="el-icon-unlock el-icon-table" @click="setLockHandler(scope.row)"></i>
+          <i v-else class="el-icon-lock el-icon-table" @click="setLockHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
@@ -33,12 +36,15 @@
     </el-pagination>
 
 
-    <el-dialog title="添加客户" :visible.sync="addDialogVisiable" width="650px">
+    <el-dialog title="添加用户" :visible.sync="addDialogVisiable" width="650px">
       <el-form :model="addForm">
-        <el-form-item label="员工编号" :label-width="formLabelWidth">
+        <el-form-item label="用户编号" :label-width="formLabelWidth">
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="员工姓名" :label-width="formLabelWidth">
+        <el-form-item label="用户名" :label-width="formLabelWidth">
+          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="用户姓名" :label-width="formLabelWidth">
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="性别" :label-width="formLabelWidth">
@@ -47,10 +53,7 @@
         <el-form-item label="联系方式" :label-width="formLabelWidth">
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="员工住址" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="身份证号" :label-width="formLabelWidth">
+        <el-form-item label="用户角色" :label-width="formLabelWidth">
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
@@ -61,7 +64,7 @@
     </el-dialog>
 
     <el-dialog title="提示" :visible.sync="confirmVisible" width="30%" :before-close="confirmCloseHandler">
-      <span>确定删除此客户信息?</span>
+      <span>确定删除此用户信息?</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="confirmVisible = false">取 消</el-button>
         <el-button type="primary" @click="confirmVisible = false">确 定</el-button>
@@ -82,19 +85,23 @@ name: "user",
       tableData: [{
         date: '0001',
         name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
+        address: '上海市普陀区金沙江路 1518 弄',
+        status: 0,
       }, {
         date: '0002',
         name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
+        address: '上海市普陀区金沙江路 1517 弄',
+        status: 0,
       }, {
         date: '0002',
         name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
+        address: '上海市普陀区金沙江路 1519 弄',
+        status: 0,
       }, {
         date: '0004',
         name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
+        address: '上海市普陀区金沙江路 1516 弄',
+        status: 0,
       }],
       addForm: {
         name: '',
@@ -117,7 +124,13 @@ name: "user",
       this.addDialogVisiable = true
     },
     delHandler(row){
+      this.confirmVisible = true
+    },
+    setRoleHandler(row){
 
+    },
+    setLockHandler(row){
+      row.status = row.status == 0?1:0
     },
     confirmCloseHandler() {
 

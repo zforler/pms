@@ -1,3 +1,5 @@
+import fa from "element-ui/src/locale/lang/fa";
+
 class LMenu {
     constructor(param = {}){
         this.menuCache = []
@@ -16,27 +18,32 @@ class LMenu {
         let me = this
         this.elContainer.innerHTML = this.innerContainer
         this.elInnerContainer = document.querySelector('#LMenu')
-        this.elInnerContainer.addEventListener('click',(e)=>{
-            let target = e.target
-            if(target.dataset.type){
-                let id = target.dataset.id
-                //执行监听的click方法
-                if(me.event.click instanceof Function){
-                    console.log(me.flatMenuCache)
-                    me.event.click(me.flatMenuCache.get(id))
-                }
-                let childs = me.menuElementCache[id]
-                if(childs){
-                    let targetJson = me.flatMenuCache.get(id)
-                    if(targetJson.extend == true){
-                        me.flodUp(id)
-                        target.classList.remove('L-item-open')
-                    }else{
-                        for (let i = 0, len = childs.length; i < len; i++) {
-                            childs[i].classList.add('L-item-extend')
+    }
+    _addClickListener(){
+        let me = this
+        document.querySelectorAll('.L-item').forEach((element) => {
+            element.onclick = function (){
+                let target = this
+                if(target.dataset.type){
+                    let id = target.dataset.id
+                    //执行监听的click方法
+                    if(me.event.click instanceof Function){
+                        console.log(me.flatMenuCache)
+                        me.event.click(me.flatMenuCache.get(id))
+                    }
+                    let childs = me.menuElementCache[id]
+                    if(childs){
+                        let targetJson = me.flatMenuCache.get(id)
+                        if(targetJson.extend == true){
+                            me.flodUp(id)
+                            target.classList.remove('L-item-open')
+                        }else{
+                            for (let i = 0, len = childs.length; i < len; i++) {
+                                childs[i].classList.add('L-item-extend')
+                            }
+                            targetJson.extend = true
+                            target.classList.add('L-item-open')
                         }
-                        targetJson.extend = true
-                        target.classList.add('L-item-open')
                     }
                 }
             }
@@ -85,11 +92,21 @@ class LMenu {
             item.appendChild(nameSpan)
             item.id = value._id
             item.dataset.type= value.type
-            item.dataset.level= value._level
             item.dataset.id= value._id
             item.dataset.parentId= value._parentId
             item.classList.add('L-item')
-            item.style.paddingLeft = (value._level - 1) * 15 + 15 + 'px'
+
+            if(value.hidden){
+                item.style.display = 'none'
+            }
+            console.log(this.flatMenuCache.get(value._parentId))
+            if(this.flatMenuCache.has(value._parentId) && this.flatMenuCache.get(value._parentId).hidden){
+                item.dataset.level = 1
+                item.style.paddingLeft =  15 + 'px'
+            }else{
+                item.dataset.level= value._level
+                item.style.paddingLeft = (value._level - 1) * 15 + 15 + 'px'
+            }
             //有子节点的菜单添加右侧图标
             if(value.children){
                 this.appendRightIcon(item)
@@ -102,6 +119,7 @@ class LMenu {
             this.menuElementCache[value._parentId].push(item)
         }
         this.elInnerContainer.appendChild(frag)
+        this._addClickListener()
     }
 
     //json对象转化为数组
