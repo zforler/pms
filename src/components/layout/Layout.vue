@@ -7,7 +7,7 @@
     <div class="l-right-container">
       <div class="l-right-top">
         <div class="l-right-top-company">
-          <h2>xxxgong公司</h2>
+          <h3>xxxgong公司</h3>
         </div>
         <div class="l-right-top-user-c">
           <div class="l-right-top-user" @click="userClick">系统管理员</div>
@@ -17,9 +17,11 @@
         </div>
       </div>
       <div class="l-right-content">
-        <LTabs></LTabs>
-        <div class="l-right-bcontainer">
-          <TabVIews></TabVIews>
+        <div class="l-right-content-inner">
+          <LTabs></LTabs>
+          <div class="l-right-bcontainer">
+            <TabVIews></TabVIews>
+          </div>
         </div>
       </div>
     </div>
@@ -141,7 +143,7 @@ name: "Layout",
     height: $h-100vh;
   }
   .l-left-logo{
-    height: 75px;
+    height: 55px;
   }
   .l-right-container{
     background-color: $bg-color;
@@ -151,11 +153,13 @@ name: "Layout",
   }
   .l-right-top{
     padding: 15px 25px;
-    height: 75px;
+    height: 55px;
     background-color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: #f0f0f0 thin solid;
+    box-shadow: #ccc 5px 1px 10px;
   }
 
   .l-right-bcontainer{
@@ -164,9 +168,12 @@ name: "Layout",
   .l-right-content {
     padding: 25px;
   }
+.l-right-content-inner {
+  border: #f0f0f0 thin solid;
+}
 .l-right-bcontainer {
   background-color: #fff;
-  min-height: calc(100vh - 176px);
+  min-height: calc(100vh - 156px);
 }
 /*用户信息*/
 .l-right-top-user-c {

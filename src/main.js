@@ -44,6 +44,7 @@ const router = new VueRouter({
       path: '/',
       component: Layout,
       type: 1,
+      icon: 'el-icon-s-custom',
       children: [
         {
           name: '员工管理',

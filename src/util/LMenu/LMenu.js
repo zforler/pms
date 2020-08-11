@@ -73,7 +73,16 @@ class LMenu {
         console.log(this.flatMenuCache)
         for (let [key,value] of this.flatMenuCache){
             let item = document.createElement('li')
-            item.innerText = value.name
+            if(value.icon){
+                let icon = document.createElement("i")
+                icon.classList.add(value.icon,"L-item-icon")
+                item.appendChild(icon)
+            }
+            let nameSpan = document.createElement('span')
+            nameSpan.classList.add('L-item-name')
+            nameSpan.innerText = value.name
+            // item.innerText = value.name
+            item.appendChild(nameSpan)
             item.id = value._id
             item.dataset.type= value.type
             item.dataset.level= value._level
