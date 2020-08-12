@@ -152,7 +152,7 @@ name: "Layout",
     height: $h-100vh;
   }
   .l-right-top{
-    padding: 15px 25px;
+    padding: 15px $p-25;
     height: 55px;
     background-color: #fff;
     display: flex;
@@ -163,10 +163,10 @@ name: "Layout",
   }
 
   .l-right-bcontainer{
-    padding: 25px;
+    padding: $p-25;
   }
   .l-right-content {
-    padding: 25px;
+    padding: $p-25;
   }
 .l-right-content-inner {
   border: #f0f0f0 thin solid;

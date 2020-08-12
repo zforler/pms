@@ -6,6 +6,7 @@ $bg-color-tab: #e4e4ff;/*tab标签颜色*/
 $font-color: #555555;
 $menu-width: 250px;
 $h-100vh:100vh;
+$p-25: 25px;
 html{
   font-size: 15px;
 }
@@ -25,7 +26,14 @@ li{
   justify-content: center;
   align-items: center;
 }
-
+.l-add-buttion{
+  font-size: 35px;
+  cursor: pointer;
+}
+.l-operate-buttion{
+  font-size: 35px;
+  cursor: pointer;
+}
 /*element-ui*/
 .el-dialog__footer{
   text-align: center;
@@ -42,11 +50,10 @@ li{
   cursor: pointer;
   margin-right: 8px;
 }
-.l-add-buttion{
-  font-size: 35px;
-  cursor: pointer;
-}
 .el-pagination{
   text-align: right;
   padding: 15px 0;
+}
+.el-table thead th{
+  background-color: #f5f7fa;
 }

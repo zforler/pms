@@ -1,21 +1,23 @@
 <template>
-  <div class="operateLog-container">
+  <div class="productLog-container">
     <div class="t-top-bar">
       <el-input placeholder="请输入内容" v-model="searchValue" class="input-with-select search-input">
         <el-button  slot="append"  type="primary" icon="el-icon-search">搜索</el-button>
       </el-input>
     </div>
     <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="date" label="企业编号"></el-table-column>
-      <el-table-column prop="date" label="企业名称"></el-table-column>
-      <el-table-column prop="date" label="用户编号"></el-table-column>
-      <el-table-column prop="address" label="用户名称"></el-table-column>
-      <el-table-column prop="address" label="用户IP"></el-table-column>
-      <el-table-column prop="address" label="操作名称"></el-table-column>
-      <el-table-column prop="name" label="参数"></el-table-column>
-      <el-table-column prop="name" label="响应结果"></el-table-column>
-      <el-table-column prop="name" label="响应时间"></el-table-column>
-      <el-table-column prop="name" label="请求时间"></el-table-column>
+      <el-table-column prop="date" label="记录编号"></el-table-column>
+      <el-table-column prop="address" label="电卡编号"></el-table-column>
+      <el-table-column prop="address" label="设备编号"></el-table-column>
+      <el-table-column prop="name" label="产品"></el-table-column>
+      <el-table-column prop="name" label="批次"></el-table-column>
+      <el-table-column prop="name" label="工艺"></el-table-column>
+      <el-table-column prop="name" label="规格"></el-table-column>
+      <el-table-column prop="name" label="白/夜班"></el-table-column>
+      <el-table-column prop="name" label="员工编号"></el-table-column>
+      <el-table-column prop="name" label="记录时间"></el-table-column>
+      <el-table-column prop="name" label="上传时间"></el-table-column>
+      <el-table-column prop="name" label="记录金额"></el-table-column>
     </el-table>
     <el-pagination
         @size-change="handleSizeChange"
@@ -32,7 +34,7 @@
 
 <script>
 export default {
-  name: "operateLog",
+  name: "productLog-container",
   data() {
     return {
       searchValue: '',

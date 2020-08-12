@@ -194,6 +194,30 @@ const router = new VueRouter({
           type: 2,
           icon: 'el-icon-document',
           component: () => import('./components/equipment/equipmentFaultLog.vue')
+        },
+        {
+          name: '生产记录',
+          path: '/productLog',
+          type: 2,
+          icon: 'el-icon-s-order',
+          component: () => import('./components/equipment/productLog.vue')
+        },
+      ]
+    },
+    {
+      name: '工资管理',
+      path: '/',
+      component: Layout,
+      type: 1,
+      icon: 'el-icon-document',
+      hidden: true,
+      children: [
+        {
+          name: '工资管理',
+          path: '/salary',
+          type: 2,
+          icon: 'el-icon-date',
+          component: () => import('./components/salary/salary.vue')
         }
       ]
     },
@@ -203,11 +227,13 @@ const router = new VueRouter({
       component: Layout,
       type: 1,
       icon: 'el-icon-document',
+      hidden: true,
       children: [
         {
           name: '我的报表',
           path: '/report',
           type: 2,
+          icon: 'el-icon-document',
           component: () => import('./components/report/report.vue')
         }
       ]
