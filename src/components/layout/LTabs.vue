@@ -5,7 +5,7 @@
           :class="item.active ? 'l-tab-item l-tab-item-active' : 'l-tab-item'"
           @click="itemClick(item)">
         {{ item.text }}
-        <i class="el-icon-close" @click="closeHandler(item)"></i>
+        <i v-if="item.close !== false" class="el-icon-close" @click="closeHandler(item)"></i>
       </li>
     </ul>
   </div>
@@ -15,10 +15,17 @@
 export default {
   name: "LTabs",
   data() {
+      let index = {
+          text: '首页',
+          path: '/index',
+          active: true,
+          close: false,
+      }
     return {
       tabItems: [
+          index
       ],
-      activeItem: ''
+      activeItem: index
     }
   },
   props: {
@@ -34,7 +41,8 @@ export default {
       let item = {
         text: to.name,
         path: to.path,
-        active: true
+        active: true,
+        close: to.meta.close
       }
       this.pushItem(item)
     }
@@ -44,8 +52,10 @@ export default {
     let item = {
       text: currentRoute.name,
       path: currentRoute.path,
-      active: true
+      active: true,
+      close: currentRoute.meta.close
     }
+    console.log(currentRoute)
     this.pushItem(item)
 
     for (let i = 0, len = this.tabItems.length; i < len; i++) {
@@ -61,6 +71,9 @@ export default {
     pushItem(item) {
       if(this.activeItem){
         if(this.activeItem.path == item.path){
+            if(this.tabItems.length == 0){
+                this.tabItems.push(item)
+            }
           return
         }else{
           let res = this.checkHas(item)
