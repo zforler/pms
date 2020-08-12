@@ -5,6 +5,7 @@
           :class="item.active ? 'l-tab-item l-tab-item-active' : 'l-tab-item'"
           @click="itemClick(item)">
         {{ item.text }}
+        <i class="el-icon-close" @click="closeHandler(item)"></i>
       </li>
     </ul>
   </div>
@@ -94,6 +95,21 @@ export default {
       this.activeItem.active = undefined
       item.active = true
       this.activeItem = item
+    },
+    closeHandler(item) {
+        for (let i = 0, len = this.tabItems.length; i < len; i++) {
+            if(item.path == this.tabItems[i].path){
+                this.tabItems.splice(i,1)
+            }
+        }
+        if(item.active) {
+            let next = this.tabItems[this.tabItems.length - 1]
+            if (next) {
+                this.$router.push(next.path)
+                next.active = true
+                this.activeItem = next
+            }
+        }
     }
   }
 }
@@ -103,6 +119,7 @@ export default {
 @import "../../styles/common.scss";
 @import "../../styles/ltab.scss";
 .l-tab-container {
-  background-color:$theme-color;
+    background-color: #fff;
+    border-bottom: #ccc thin solid;
 }
 </style>

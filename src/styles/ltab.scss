@@ -20,14 +20,9 @@
   white-space: nowrap;
 
 }
-.l-tab-item:hover{
-  background: #fff;
-  border-bottom: thin solid #fff;
-  margin-bottom: -1px;
-  color:$font-color;
-}
-.l-tab-item-active{
-  background: #fff;
-  border-bottom: thin solid #fff;
-  color:$font-color;
+
+.l-tab-item:hover,.l-tab-item-active{
+  background: $theme-color;
+  color:#fff;
+  border-radius: 2px 2px 0 0;
 }
