@@ -26,6 +26,24 @@ const router = new VueRouter({
   // scrollBehavior: () => ({ y: 0 }),
   routes: [
       {
+          name: '首页',
+          path: '/',
+          component: Layout,
+          type: 1,
+          hidden: true,
+          close: false,
+          children: [
+              {
+                  name: '首页',
+                  path: '/index',
+                  type: 2,
+                  icon: 'el-icon-s-home',
+                  meta: {close:false},
+                  component: () => import('./components/index/index.vue')
+              }
+          ]
+      },
+      {
         name: '客户管理',
         path: '/',
         component: Layout,
