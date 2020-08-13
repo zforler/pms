@@ -1,6 +1,6 @@
 <template>
     <div>
-        index
+        {{'1534556864' | formateTime()}}
     </div>
 </template>
 

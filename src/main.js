@@ -1,10 +1,16 @@
 import Vue from 'vue'
 import VueRouter from "vue-router";
 import App from './App.vue'
+import * as filters from './util/filters'
 import Layout from "@/components/layout/Layout";
 import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree} from "element-ui";
 
 Vue.config.productionTip = false
+
+// register global utility filters.
+Object.keys(filters).forEach(key => {
+    Vue.filter(key, filters[key])
+})
 
 Vue.use(VueRouter)
 Vue.use(Table)

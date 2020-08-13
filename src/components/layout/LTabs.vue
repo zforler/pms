@@ -37,7 +37,6 @@ export default {
   watch: {
     $route(to, from) {
       // 对路由变化作出响应...
-      console.log(to, from)
       let item = {
         text: to.name,
         path: to.path,
@@ -55,7 +54,6 @@ export default {
       active: true,
       close: currentRoute.meta.close
     }
-    console.log(currentRoute)
     this.pushItem(item)
 
     for (let i = 0, len = this.tabItems.length; i < len; i++) {

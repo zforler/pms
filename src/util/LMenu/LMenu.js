@@ -28,7 +28,6 @@ class LMenu {
                     let id = target.dataset.id
                     //执行监听的click方法
                     if(me.event.click instanceof Function){
-                        console.log(me.flatMenuCache)
                         me.event.click(me.flatMenuCache.get(id))
                     }
                     let childs = me.menuElementCache[id]
@@ -51,13 +50,11 @@ class LMenu {
     }
     //折叠所有子菜单
     flodUp(id){
-        console.log(id)
         let childs = this.menuElementCache[id]
         if(childs){
             for (let i = 0, len = childs.length; i < len; i++) {
                 this.flodUp(childs[i].dataset.id)
                 childs[i].classList.remove('L-item-extend')
-                console.log(childs[i].dataset.type)
                 if(childs[i].dataset.type == LMenu.MENU_TYPE.MENU){
                     childs[i].classList.remove('L-item-open')
                 }
@@ -77,7 +74,6 @@ class LMenu {
     render(jsonArr = []){
         this.flatMenuCache  = this._flatJson(jsonArr)
         let frag = document.createDocumentFragment();
-        console.log(this.flatMenuCache)
         for (let [key,value] of this.flatMenuCache){
             let item = document.createElement('li')
             if(value.icon){
@@ -99,7 +95,6 @@ class LMenu {
             if(value.hidden){
                 item.style.display = 'none'
             }
-            console.log(this.flatMenuCache.get(value._parentId))
             if(this.flatMenuCache.has(value._parentId) && this.flatMenuCache.get(value._parentId).hidden){
                 item.dataset.level = 1
                 item.style.paddingLeft =  15 + 'px'
@@ -162,7 +157,6 @@ class LMenu {
 
     }
     setActive(value, type='path') {
-        console.log('aaa',this.menuElementCache)
         for(let [key, val] of this.flatMenuCache){
             if(val[type] == value){
                 let active = document.querySelector('.L-item-active')
