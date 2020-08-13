@@ -4,6 +4,7 @@ import App from './App.vue'
 import * as filters from './util/filters'
 import Layout from "@/components/layout/Layout";
 import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree} from "element-ui";
+import './icons'
 
 Vue.config.productionTip = false
 
@@ -45,7 +46,7 @@ const router = new VueRouter({
                   type: 2,
                   icon: 'el-icon-s-home',
                   meta: {close:false},
-                  component: () => import('./components/index/index.vue')
+                  component: () => import('./page/index/index.vue')
               }
           ]
       },
@@ -61,7 +62,7 @@ const router = new VueRouter({
             path: '/customer',
             type: 2,
             icon: 'el-icon-s-custom',
-            component: () => import('./components/customer/customer.vue')
+            component: () => import('./page/customer/customer.vue')
           }
         ]
       },
@@ -77,14 +78,14 @@ const router = new VueRouter({
           path: '/staff',
           type: 2,
           icon: 'el-icon-user-solid',
-          component: () => import('./components/staff/staff.vue')
+          component: () => import('./page/staff/staff.vue')
         },
       {
           name: '工资管理',
           path: '/salary',
           type: 2,
           icon: 'el-icon-date',
-          component: () => import('./components/salary/salary.vue')
+          component: () => import('./page/salary/salary.vue')
       }
       ]
     },
@@ -100,14 +101,14 @@ const router = new VueRouter({
           path: '/user',
           type: 2,
           icon: 'el-icon-user',
-          component: () => import('./components/user/user.vue')
+          component: () => import('./page/user/user.vue')
         },
         {
           name: '角色管理',
           path: '/role',
           type: 2,
           icon: 'el-icon-medal',
-          component: () => import('./components/user/role.vue')
+          component: () => import('./page/user/role.vue')
         }
       ]
     },
@@ -123,49 +124,49 @@ const router = new VueRouter({
           path: '/production',
           type: 2,
           icon: 'el-icon-s-grid',
-          component: () => import('./components/production/production.vue')
+          component: () => import('./page/production/production.vue')
         },
         {
           name: '工艺管理',
           path: '/technology',
           type: 2,
           icon: 'el-icon-s-operation',
-          component: () => import('./components/production/technology.vue')
+          component: () => import('./page/production/technology.vue')
         },
         {
           name: '规格管理',
           path: '/spec',
           type: 2,
           icon: 'el-icon-price-tag',
-          component: () => import('./components/production/spec.vue')
+          component: () => import('./page/production/spec.vue')
         },
         {
           name: '批次管理',
           path: '/batch',
           type: 2,
           icon: 'el-icon-menu',
-          component: () => import('./components/production/batch.vue')
+          component: () => import('./page/production/batch.vue')
         },
         {
           name: '工价管理',
           path: '/price',
           type: 2,
           icon: 'el-icon-notebook-1',
-          component: () => import('./components/production/price.vue')
+          component: () => import('./page/production/price.vue')
         },
           {
               name: '班次管理',
               path: '/shift',
               type: 2,
               icon: 'el-icon-timer',
-              component: () => import('./components/production/shift.vue')
+              component: () => import('./page/production/shift.vue')
           },
           {
               name: '交料修正',
               path: '/productEdit',
               type: 2,
               icon: 'el-icon-edit',
-              component: () => import('./components/production/productEdit.vue')
+              component: () => import('./page/production/productEdit.vue')
           },
       ]
     },
@@ -181,7 +182,7 @@ const router = new VueRouter({
           path: '/card',
           type: 2,
           icon: 'el-icon-bank-card',
-          component: () => import('./components/card/card.vue')
+          component: () => import('./page/card/card.vue')
         }
       ]
     },
@@ -197,7 +198,7 @@ const router = new VueRouter({
           path: '/organization',
           type: 2,
           icon: 'el-icon-share',
-          component: () => import('./components/organization/organization.vue')
+          component: () => import('./page/organization/organization.vue')
         }
       ]
     },
@@ -213,21 +214,21 @@ const router = new VueRouter({
           path: '/equipment',
           type: 2,
           icon: 'el-icon-data-analysis',
-          component: () => import('./components/equipment/equipment.vue')
+          component: () => import('./page/equipment/equipment.vue')
         },
         {
           name: '设备故障日志',
           path: '/equipmentFaultLog',
           type: 2,
           icon: 'el-icon-document',
-          component: () => import('./components/equipment/equipmentFaultLog.vue')
+          component: () => import('./page/equipment/equipmentFaultLog.vue')
         },
         {
           name: '生产记录',
           path: '/productLog',
           type: 2,
           icon: 'el-icon-s-order',
-          component: () => import('./components/equipment/productLog.vue')
+          component: () => import('./page/equipment/productLog.vue')
         },
       ]
     },
@@ -244,7 +245,7 @@ const router = new VueRouter({
           path: '/report',
           type: 2,
           icon: 'el-icon-document',
-          component: () => import('./components/report/report.vue')
+          component: () => import('./page/report/report.vue')
         }
       ]
     },
@@ -260,21 +261,21 @@ const router = new VueRouter({
           path: '/menu',
           type: 2,
           icon: 'el-icon-document-copy',
-          component: () => import('./components/system/menu.vue')
+          component: () => import('./page/system/menu.vue')
         },
         {
           name: '数据字典',
           path: '/dataItem',
           type: 2,
           icon: 'el-icon-reading',
-          component: () => import('./components/system/dataItem.vue')
+          component: () => import('./page/system/dataItem.vue')
         },
         {
           name: '操作日志',
           path: '/operateLog',
           type: 2,
           icon: 'el-icon-document',
-          component: () => import('./components/system/operateLog.vue')
+          component: () => import('./page/system/operateLog.vue')
         }
       ]
     },

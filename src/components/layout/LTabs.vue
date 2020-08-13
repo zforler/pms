@@ -127,8 +127,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../../styles/common.scss";
-@import "../../styles/ltab.scss";
+@import "../../styles/common";
+@import "../../styles/ltab";
 .l-tab-container {
     background-color: #fff;
     border-bottom: #ccc thin solid;
