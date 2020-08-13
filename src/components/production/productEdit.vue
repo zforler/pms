@@ -1,5 +1,5 @@
 <template>
-  <div class="price-container">
+  <div class="productEdit-container">
     <div class="t-top-bar">
       <el-input placeholder="请输入内容" v-model="searchValue" class="input-with-select search-input">
         <el-button  slot="append"  type="primary" icon="el-icon-search">搜索</el-button>
@@ -7,19 +7,21 @@
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="date" label="规则编号" width="80"></el-table-column>
-      <el-table-column prop="name" label="规则名称"></el-table-column>
-      <el-table-column prop="name" label="产品名称"></el-table-column>
-      <el-table-column prop="name" label="产品批次"></el-table-column>
-      <el-table-column prop="name" label="规格名称"></el-table-column>
-      <el-table-column prop="name" label="工艺名称"></el-table-column>
-      <el-table-column prop="name" label="员工类型"></el-table-column>
-      <el-table-column prop="name" label="班次"></el-table-column>
-        <el-table-column prop="name" label="单价"></el-table-column>
-      <el-table-column prop="name" label="生效时间"></el-table-column>
-      <el-table-column prop="name" label="失效时间"></el-table-column>
+      <el-table-column prop="date" label="记录编号" width="80"></el-table-column>
+      <el-table-column prop="name" label="设备编号"></el-table-column>
+      <el-table-column prop="name" label="原产品"></el-table-column>
+      <el-table-column prop="name" label="原批次"></el-table-column>
+      <el-table-column prop="name" label="原规格"></el-table-column>
+      <el-table-column prop="name" label="原工艺"></el-table-column>
+        <el-table-column prop="name" label="原单价"></el-table-column>
+        <el-table-column prop="name" label="现产品"></el-table-column>
+        <el-table-column prop="name" label="现批次"></el-table-column>
+        <el-table-column prop="name" label="现规格"></el-table-column>
+        <el-table-column prop="name" label="现工艺"></el-table-column>
+        <el-table-column prop="name" label="现单价"></el-table-column>
+        <el-table-column prop="name" label="开始时间"></el-table-column>
+        <el-table-column prop="name" label="结束时间"></el-table-column>
       <el-table-column prop="name" label="添加时间"></el-table-column>
-      <el-table-column prop="name" label="修改时间"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
@@ -86,7 +88,7 @@
 
 <script>
     export default {
-        name: "price",
+        name: "productEdit",
         data() {
             return {
                 searchValue: '',

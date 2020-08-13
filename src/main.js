@@ -66,11 +66,11 @@ const router = new VueRouter({
         ]
       },
     {
-      name: '员工管理',
+      name: '人事薪资',
       path: '/',
       component: Layout,
       type: 1,
-      hidden: true,
+      icon: 'el-icon-user-solid',
       children: [
         {
           name: '员工管理',
@@ -78,7 +78,14 @@ const router = new VueRouter({
           type: 2,
           icon: 'el-icon-user-solid',
           component: () => import('./components/staff/staff.vue')
-        }
+        },
+      {
+          name: '工资管理',
+          path: '/salary',
+          type: 2,
+          icon: 'el-icon-date',
+          component: () => import('./components/salary/salary.vue')
+      }
       ]
     },
     {
@@ -105,7 +112,7 @@ const router = new VueRouter({
       ]
     },
     {
-      name: '产品管理',
+      name: '生产管理',
       path: '/',
       component: Layout,
       type: 1,
@@ -146,6 +153,20 @@ const router = new VueRouter({
           icon: 'el-icon-notebook-1',
           component: () => import('./components/production/price.vue')
         },
+          {
+              name: '班次管理',
+              path: '/shift',
+              type: 2,
+              icon: 'el-icon-timer',
+              component: () => import('./components/production/shift.vue')
+          },
+          {
+              name: '交料修正',
+              path: '/productEdit',
+              type: 2,
+              icon: 'el-icon-edit',
+              component: () => import('./components/production/productEdit.vue')
+          },
       ]
     },
     {
@@ -208,23 +229,6 @@ const router = new VueRouter({
           icon: 'el-icon-s-order',
           component: () => import('./components/equipment/productLog.vue')
         },
-      ]
-    },
-    {
-      name: '工资管理',
-      path: '/',
-      component: Layout,
-      type: 1,
-      icon: 'el-icon-document',
-      hidden: true,
-      children: [
-        {
-          name: '工资管理',
-          path: '/salary',
-          type: 2,
-          icon: 'el-icon-date',
-          component: () => import('./components/salary/salary.vue')
-        }
       ]
     },
     {

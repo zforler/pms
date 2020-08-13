@@ -13,9 +13,10 @@
       <el-table-column prop="name" label="联系方式"></el-table-column>
       <el-table-column prop="name" label="员工住址"></el-table-column>
       <el-table-column prop="name" label="身份证号"></el-table-column>
+      <el-table-column prop="name" label="员工类型"></el-table-column>
+      <el-table-column prop="name" label="状态"></el-table-column>
       <el-table-column prop="name" label="添加时间"></el-table-column>
       <el-table-column prop="name" label="修改时间"></el-table-column>
-      <el-table-column prop="name" label="状态"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
@@ -56,6 +57,9 @@
         <el-form-item label="身份证号" :label-width="formLabelWidth">
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
+          <el-form-item label="员工类型" :label-width="formLabelWidth">
+              <el-input v-model="addForm.name" autocomplete="off"></el-input>
+          </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
