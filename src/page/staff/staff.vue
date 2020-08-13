@@ -86,8 +86,10 @@
 </template>
 
 <script>
+import Company from "@/components/Company/Company";
 export default {
 name: "staff",
+  components: {Company},
   data() {
     return {
       searchValue: '',

@@ -3,7 +3,8 @@ import VueRouter from "vue-router";
 import App from './App.vue'
 import * as filters from './util/filters'
 import Layout from "@/components/layout/Layout";
-import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree} from "element-ui";
+import Company from "@/components/Company/Company";
+import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree,Tooltip} from "element-ui";
 import './icons'
 
 Vue.config.productionTip = false
@@ -14,6 +15,7 @@ Object.keys(filters).forEach(key => {
 })
 
 Vue.use(VueRouter)
+Vue.use(Company)
 Vue.use(Table)
 Vue.use(TableColumn)
 Vue.use(Button)
@@ -25,6 +27,7 @@ Vue.use(Form)
 Vue.use(FormItem)
 Vue.use(Pagination)
 Vue.use(Tree)
+Vue.use(Tooltip)
 
 const temp = {
   template: `<router-view></router-view>`
