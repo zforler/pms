@@ -8,10 +8,7 @@
     </div>
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column prop="date" label="规则编号" width="80"></el-table-column>
-      <el-table-column prop="name" label="规则名称"></el-table-column>
-      <el-table-column prop="name" label="产品名称"></el-table-column>
-      <el-table-column prop="name" label="规格名称"></el-table-column>
-      <el-table-column prop="name" label="工艺名称"></el-table-column>
+      <el-table-column prop="name" label="规则名称">{{'产品-规格-工艺'}}</el-table-column>
       <el-table-column prop="name" label="员工类型"></el-table-column>
       <el-table-column prop="name" label="班次"></el-table-column>
         <el-table-column prop="name" label="单价"></el-table-column>
