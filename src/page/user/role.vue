@@ -34,8 +34,13 @@
         <el-form-item label="角色名称" :label-width="formLabelWidth">
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
+        <el-form-item label="权限设置" :label-width="formLabelWidth">
+          <div class="add-role-auth-tree">
+            <el-tree  show-checkbox :data="treeData" :props="defaultTree" @node-click="handleNodeClick"></el-tree>
+          </div>
+
+        </el-form-item>
       </el-form>
-      <el-tree  show-checkbox :data="treeData" :props="defaultTree" @node-click="handleNodeClick"></el-tree>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
@@ -172,5 +177,9 @@ export default {
   font-size: 35px;
   float: right;
   cursor: pointer;
+}
+.add-role-auth-tree {
+  height: 325px;
+  overflow: auto;
 }
 </style>

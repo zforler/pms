@@ -9,16 +9,21 @@
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column prop="date" label="记录编号" width="80"></el-table-column>
       <el-table-column prop="name" label="设备编号"></el-table-column>
-      <el-table-column prop="name" label="原产品"></el-table-column>
-      <el-table-column prop="name" label="原批次"></el-table-column>
-      <el-table-column prop="name" label="原规格"></el-table-column>
-      <el-table-column prop="name" label="原工艺"></el-table-column>
-        <el-table-column prop="name" label="原单价"></el-table-column>
-        <el-table-column prop="name" label="现产品"></el-table-column>
-        <el-table-column prop="name" label="现批次"></el-table-column>
-        <el-table-column prop="name" label="现规格"></el-table-column>
-        <el-table-column prop="name" label="现工艺"></el-table-column>
-        <el-table-column prop="name" label="现单价"></el-table-column>
+      <el-table-column prop="name" label="原产品/现产品">
+        <template slot-scope="scope">{{'原产品/现产品'}}</template>
+      </el-table-column>
+      <el-table-column prop="name" label="原批次/现批次">
+        <template slot-scope="scope">{{'原批次/现批次'}}</template>
+      </el-table-column>
+      <el-table-column prop="name" label="原规格/现规格">
+        <template slot-scope="scope">{{'原规格/现规格'}}</template>
+      </el-table-column>
+      <el-table-column prop="name" label="原工艺/现工艺">
+        <template slot-scope="scope">{{'原工艺/现工艺'}}</template>
+      </el-table-column>
+        <el-table-column prop="name" label="原单价/现单价">
+          <template slot-scope="scope">{{'原单价/现单价'}}</template>
+        </el-table-column>
         <el-table-column prop="name" label="开始时间"></el-table-column>
         <el-table-column prop="name" label="结束时间"></el-table-column>
       <el-table-column prop="name" label="添加时间"></el-table-column>

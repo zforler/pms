@@ -11,6 +11,7 @@
       <el-table-column prop="name" label="电卡内码"></el-table-column>
       <el-table-column prop="name" label="电卡名称" width="180"></el-table-column>
       <el-table-column prop="name" label="电卡类型"></el-table-column>
+      <el-table-column prop="name" label="绑定信息"></el-table-column>
       <el-table-column prop="name" label="添加时间"></el-table-column>
       <el-table-column prop="name" label="修改时间"></el-table-column>
       <el-table-column label="操作">

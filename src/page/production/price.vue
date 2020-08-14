@@ -10,7 +10,6 @@
       <el-table-column prop="date" label="规则编号" width="80"></el-table-column>
       <el-table-column prop="name" label="规则名称"></el-table-column>
       <el-table-column prop="name" label="产品名称"></el-table-column>
-      <el-table-column prop="name" label="产品批次"></el-table-column>
       <el-table-column prop="name" label="规格名称"></el-table-column>
       <el-table-column prop="name" label="工艺名称"></el-table-column>
       <el-table-column prop="name" label="员工类型"></el-table-column>
@@ -47,9 +46,6 @@
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="产品名称" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="产品批次" :label-width="formLabelWidth">
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
           <el-form-item label="规格名称" :label-width="formLabelWidth">

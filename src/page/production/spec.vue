@@ -10,6 +10,7 @@
       <el-table-column prop="date" label="规格编号" width="80"></el-table-column>
       <el-table-column prop="name" label="规格名称"></el-table-column>
       <el-table-column prop="name" label="所属产品"></el-table-column>
+      <el-table-column prop="name" label="绑定卡号"></el-table-column>
       <el-table-column prop="name" label="添加时间"></el-table-column>
       <el-table-column prop="name" label="修改时间"></el-table-column>
       <el-table-column label="操作">
@@ -37,6 +38,9 @@
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="规格名称" :label-width="formLabelWidth">
+          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="选择电卡" :label-width="formLabelWidth">
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>

@@ -84,7 +84,7 @@ const router = new VueRouter({
           component: () => import('./page/staff/staff.vue')
         },
       {
-          name: '工资管理',
+          name: '工资统计',
           path: '/salary',
           type: 2,
           icon: 'el-icon-date',
