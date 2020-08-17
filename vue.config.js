@@ -17,6 +17,20 @@ module.exports = {
             .options({
                 symbolId: 'icon-[name]'
             })
+    },
+    devServer: {
+        // 配置代理
+        proxy: {
+            //代理接口前缀为/api的请求
+            '/': {
+                target: '127.0.0.1:8080', //需要代理到的目标地址
+                // ws: true,
+                changOrigin: true, //是否跨域
+                pathRewrite: {
+                    '^/': '' //重写路径
+                }
+            }
+        }
     }
     // configureWebpack: {
     //     module: {

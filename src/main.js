@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import App from './App.vue'
 import * as filters from './util/filters'
 import Layout from "@/components/layout/Layout";
+import login from "@/page/login/login";
 import Company from "@/components/Company/Company";
 import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree,Tooltip} from "element-ui";
 import './icons'
@@ -32,9 +33,17 @@ Vue.use(Tooltip)
 const temp = {
   template: `<router-view></router-view>`
 }
+console.log(process.env["BASE_API"])
+
 const router = new VueRouter({
   // scrollBehavior: () => ({ y: 0 }),
   routes: [
+    {
+      name: '首页',
+      path: '/login',
+      component: login,
+      hidden: true,
+    },
       {
           name: '首页',
           path: '/',
