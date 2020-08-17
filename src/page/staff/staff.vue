@@ -7,17 +7,20 @@
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="date" label="员工编号" width="80"></el-table-column>
-      <el-table-column prop="name" label="员工姓名" width="180"></el-table-column>
-      <el-table-column prop="address" label="性别" width="230"></el-table-column>
-      <el-table-column prop="name" label="联系方式"></el-table-column>
-      <el-table-column prop="name" label="员工住址"></el-table-column>
-      <el-table-column prop="name" label="身份证号"></el-table-column>
-      <el-table-column prop="name" label="员工类型"></el-table-column>
-      <el-table-column prop="name" label="状态"></el-table-column>
-      <el-table-column prop="name" label="添加时间"></el-table-column>
-      <el-table-column prop="name" label="修改时间"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column prop="date" label="员工编号" width="150"></el-table-column>
+      <el-table-column prop="name" label="员工姓名" width="150"></el-table-column>
+      <el-table-column prop="name" label="性别" width="80"></el-table-column>
+        <el-table-column prop="name" label="组织架构" width="280"></el-table-column>
+      <el-table-column prop="name" label="员工类型" width="100"></el-table-column>
+      <el-table-column prop="name" label="入职时间" width="180">{{'2020-01-01 11:25:25'}}</el-table-column>
+      <el-table-column prop="name" label="离职时间" width="180">{{'2020-01-01 11:25:25'}}</el-table-column>
+        <el-table-column prop="name" label="状态" width="80"></el-table-column>
+      <el-table-column prop="name" label="联系方式" width="100"></el-table-column>
+      <el-table-column prop="address" label="员工住址" width="280"></el-table-column>
+      <el-table-column prop="name" label="身份证号" width="150"></el-table-column>
+      <el-table-column prop="name" label="添加时间" width="130"></el-table-column>
+      <el-table-column prop="name" label="修改时间" width="130"></el-table-column>
+      <el-table-column fixed="right" width="140" label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
           <i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>
@@ -48,6 +51,12 @@
         <el-form-item label="性别" :label-width="formLabelWidth">
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
+          <el-form-item label="入职时间" :label-width="formLabelWidth">
+              <el-input v-model="addForm.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="离职时间" :label-width="formLabelWidth">
+              <el-input v-model="addForm.name" autocomplete="off"></el-input>
+          </el-form-item>
         <el-form-item label="联系方式" :label-width="formLabelWidth">
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
