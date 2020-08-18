@@ -12,7 +12,7 @@
         <div class="l-right-top-user-c">
           <div class="l-right-top-user" @click="userClick">系统管理员</div>
           <ul :class="userOperation?'l-right-top-user-opetion' : 'l-right-top-user-opetion-show'">
-            <li class="l-rtuo-item">退出</li>
+            <li class="l-rtuo-item" @click="logout">退出</li>
           </ul>
         </div>
       </div>
@@ -29,6 +29,7 @@
 </template>
 
 <script>
+    import localCache from '@/util/localCache';
 import LMenu from "@/util/LMenu/LMenu";
 import LTabs from "@/components/layout/LTabs";
 import TabVIews from "@/components/layout/TabVIews";
@@ -59,7 +60,11 @@ name: "Layout",
     },
     userClick() {
       this.userOperation = !this.userOperation
-    }
+    },
+      logout(){
+          localCache.deleteToken()
+          this.$router.push({path: '/login'})
+      }
   },
   mounted() {
     let me = this

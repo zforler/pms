@@ -7,6 +7,7 @@ import login from "@/page/login/login";
 import Company from "@/components/Company/Company";
 import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree,Tooltip} from "element-ui";
 import './icons'
+import localCache from "./util/localCache"
 
 Vue.config.productionTip = false
 
@@ -39,7 +40,7 @@ const router = new VueRouter({
   // scrollBehavior: () => ({ y: 0 }),
   routes: [
     {
-      name: '首页',
+      name: '登录',
       path: '/login',
       component: login,
       hidden: true,
@@ -292,6 +293,18 @@ const router = new VueRouter({
       ]
     },
     ]
+})
+
+router.beforeEach((to, from, next) => {
+    if(to.name != '登录'){
+        let token = localCache.getToken();
+        console.log('token', token)
+        if(!token){
+            next({ path: '/login' })
+            return false
+        }
+    }
+    next()
 })
 new Vue({
   router,

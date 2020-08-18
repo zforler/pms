@@ -4,7 +4,7 @@
       <div class="login-title">PSM</div>
       <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="login-form">
         <el-form-item label="用户名" prop="pass">
-          <el-input type="password" v-model="ruleForm.userName" autocomplete="off"></el-input>
+          <el-input v-model="ruleForm.userName" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="pass">
           <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
@@ -19,6 +19,7 @@
 </template>
 
 <script>
+    import localCache from '../../util/localCache'
 import {login} from '../../api/user'
 export default {
 name: "login",
@@ -62,8 +63,7 @@ name: "login",
       ruleForm: {
         userName: '',
         pass: '',
-        checkPass: '',
-        age: ''
+        checkPass: ''
       },
       rules: {
         pass: [
@@ -71,9 +71,6 @@ name: "login",
         ],
         checkPass: [
           { validator: validatePass2, trigger: 'blur' }
-        ],
-        age: [
-          { validator: checkAge, trigger: 'blur' }
         ]
       }
     };
@@ -85,6 +82,11 @@ name: "login",
           login({
             a:'a'
           })
+            let userInfo = {
+              userName: 'admin',
+            }
+            localCache.setToken('admin')
+            this.$router.push({path: '/index'})
         } else {
           console.log('error submit!!');
           return false;
