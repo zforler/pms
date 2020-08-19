@@ -5,7 +5,7 @@ import * as filters from './util/filters'
 import Layout from "@/components/layout/Layout";
 import login from "@/page/login/login";
 import Company from "@/components/Company/Company";
-import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree,Tooltip} from "element-ui";
+import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree,Tooltip,Radio,RadioGroup,Message} from "element-ui";
 import './icons'
 import localCache from "./util/localCache"
 
@@ -30,6 +30,9 @@ Vue.use(FormItem)
 Vue.use(Pagination)
 Vue.use(Tree)
 Vue.use(Tooltip)
+Vue.use(Radio)
+Vue.use(RadioGroup)
+Vue.prototype.$message = Message;
 
 const temp = {
   template: `<router-view></router-view>`
