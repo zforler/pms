@@ -1,5 +1,5 @@
 <template>
-    <div class="menu-container">
+    <div class="l-container menu-container">
         <div class="t-top-bar">
             <el-input placeholder="请输入内容" v-model="searchValue" class="input-with-select search-input">
                 <el-button  slot="append"  type="primary" icon="el-icon-search">搜索</el-button>
@@ -16,7 +16,7 @@
             <el-table-column prop="menuId" label="菜单编号"></el-table-column>
             <el-table-column prop="type" label="类型"></el-table-column>
             <el-table-column prop="path" label="路由"></el-table-column>
-            <el-table-column prop="filePath" label="文件路径"></el-table-column>
+            <el-table-column prop="filePath" label="文件路径" width="350px"></el-table-column>
             <el-table-column prop="icon" label="图标">
                 <template slot-scope="scope">
                     <svg-icon :icon-class="scope.row.icon" width="24px" height="24px"/>
@@ -78,8 +78,9 @@
                 </el-form-item>
                 <el-form-item label="等级" :label-width="formLabelWidth">
                     <el-select v-model="addForm.level" placeholder="请选菜单类型">
-                        <el-option label="系统可见" value="1"></el-option>
-                        <el-option label="客户可见" value="2"></el-option>
+                        <el-option label="超管可见" value="1"></el-option>
+                        <el-option label="系统可见" value="2"></el-option>
+                        <el-option label="客户可见" value="3"></el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
@@ -94,7 +95,7 @@
 
 <script>
     import icons from '../svg-icons/generateIconsView'
-    import { addMenu } from '../../api/menu'
+    import { addMenu,getMenuList } from '../../api/menu'
     export default {
         name: "menulist",
         data() {
@@ -104,56 +105,28 @@
                 innerVisible:false,
                 opFlag: 'add',
                 formLabelWidth: '120px',
-                tableData: [
-                    {
-                        menuId:1,
-                        name: '登录',
-                        path: '/login',
-                        filePath:  './page/index/index.vue',
-                        hidden: 1,
-                    },
-                  {
-                      menuId:2,
-                      name: '首页',
-                      path: '/',
-                      type: 1,
-                      hidden: 1,
-                      close: 0,
-                      icon: 'add',
-                      children: [
-                          {
-                              menuId:3,
-                              name: '首页',
-                              path: '/index',
-                              type: 2,
-                              icon: 'add',
-                              meta: {close:false},
-                              filePath: './page/index/index.vue'
-                          }
-                      ]
-                  }
-                ],
+                tableData: [],
                 addForm: {
                     name: '',
                     path: '',
                     menuId: '',
                     type: '',
-                    hidden: '',
-                    close: '',
+                    hidden: '1',
+                    close: '1',
                     filePath: '',
                     icon: '',
                     level: ''
                 },
                 // 图标
                 iconsMap: [],
-                selectRow: ''
+                selectRow: '',
             }
         },
         mounted(){
-          console.log(icons)
             this.iconsMap = icons.state.iconsMap.map((i) => {
                 return i.default.id.substring(5)
             })
+            this.getMenuList_()
         },
         methods: {
             // 查询图标
@@ -201,6 +174,7 @@
                             type: 'success'
                         })
                         this.addDialogVisiable = false
+                        this.getMenuList_()
                     }else{
                         this.$message({
                             message: res.message,
@@ -215,8 +189,8 @@
                     path: '',
                     menuId: '',
                     type: '',
-                    hidden: '',
-                    close: '',
+                    hidden: '1',
+                    close: '1',
                     filePath: '',
                     icon: '',
                     level: ''
@@ -238,6 +212,14 @@
             },
             delHandler(row){
                 this.selectRow = row
+            },
+            getMenuList_(){
+                getMenuList({
+                    keyword: this.searchValue
+                }).then((res)=>{
+                    console.log(res)
+                    this.tableData = res.data
+                })
             }
         }
     }
@@ -246,7 +228,6 @@
 <style lang="scss" scoped>
     @import "../../styles/common";
     .menu-container {
-        height: calc(100vh - 205px);
         .el-input{
             width: 350px;
         }

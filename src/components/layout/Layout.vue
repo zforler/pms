@@ -128,7 +128,7 @@ name: "Layout",
     background-color: $bg-color;
     width: calc(100% - 250px);
     float: left;
-    height: $h-100vh;
+    min-height: $h-100vh;
   }
   .l-right-top{
     padding: 15px $p-25;
