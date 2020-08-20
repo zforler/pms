@@ -5,7 +5,7 @@
           :class="item.active ? 'l-tab-item l-tab-item-active' : 'l-tab-item'"
           @click="itemClick(item)">
         {{ item.text }}
-        <i v-if="item.close !== false" class="el-icon-close" @click="closeHandler(item)"></i>
+        <i v-if="item.close !== 0" class="el-icon-close" @click="closeHandler(item)"></i>
       </li>
     </ul>
   </div>

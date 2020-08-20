@@ -12,6 +12,7 @@ class LMenu {
         this.event = {
             click: null
         }
+        this.imgUrl = param.imgUrl
         this._init()
     }
     _init(){
@@ -77,9 +78,15 @@ class LMenu {
         for (let [key,value] of this.flatMenuCache){
             let item = document.createElement('li')
             if(value.icon){
-                let icon = document.createElement("i")
-                icon.classList.add(value.icon,"L-item-icon")
+                // let icon = document.createElement("i")
+                // icon.classList.add(value.icon,"L-item-icon")
+                // item.appendChild(icon)
+                let icon = document.createElement('embed')
+                icon.src=this.imgUrl+'add'+'.svg'
+                icon.type = 'image/svg+xml'
+                icon.classList.add("L-item-icon")
                 item.appendChild(icon)
+                // <embed src="./test.svg" style="display:block;width:330px;height:240px" />
             }
             let nameSpan = document.createElement('span')
             nameSpan.classList.add('L-item-name')

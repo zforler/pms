@@ -2,7 +2,9 @@
   <div>
     <div class="l-left-container">
       <div class="l-left-logo l-flex-center">PMS</div>
-      <div id="menuc"></div>
+      <div id="menuc">
+          <Menu ref="menu" v-bind:clickHandler="clickHandler"></Menu>
+      </div>
     </div>
     <div class="l-right-container">
       <div class="l-right-top">
@@ -31,6 +33,7 @@
 <script>
     import localCache from '@/util/localCache';
 import LMenu from "@/util/LMenu/LMenu";
+import Menu from "@/components/Menu/Menu";
 import LTabs from "@/components/layout/LTabs";
 import TabVIews from "@/components/layout/TabVIews";
 export default {
@@ -43,16 +46,19 @@ name: "Layout",
   },
   components:{
     LTabs,
-    TabVIews
+    TabVIews,
+      Menu
   },
   watch: {
     $route(to, from) {
       // 对路由变化作出响应...
-      this.lmenu.setActive(to.path)
+      // this.lmenu.setActive(to.path)
+        this.$refs.menu.setActive(to.path)
     }
   },
   activated() {
-    this.lmenu.setActive(this.$router.currentRoute.path)
+    // this.lmenu.setActive(this.$router.currentRoute.path)
+    //   this.$refs.menu.setActive(this.$router.currentRoute.path)
   },
   methods: {
     view(mark){
@@ -64,73 +70,41 @@ name: "Layout",
       logout(){
           localCache.deleteToken()
           this.$router.push({path: '/login'})
+      },
+      clickHandler(e){
+        if(!e.path){
+          return
+        }
+        if(e.type == 1){
+          return
+        }
+        if(e.path === this.$router.currentRoute.path){
+          return
+        }
+        this.$router.push(e.path)
       }
   },
   mounted() {
-    let me = this
-    console.log(this.$router)
-    this.lmenu = new LMenu({container: 'menuc'})
-    // let obj = [
-    //     {
-    //         text: 'title1',
-    //         children:  [
-    //             {
-    //                 text: 'title3-1',
-    //                 path: '/a1'
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         text: 'title2',
-    //         children: [
-    //             {
-    //                 text: 'title2-1'
-    //             },
-    //             {
-    //                 text: 'title2-2',
-    //                 children: {
-    //                     text: 'title2-3-1',
-    //                     children:
-    //                         {
-    //                             text: 'title2-4-1',
-    //                             children: [
-    //                                 {
-    //                                     text: 'title2-5-1'
-    //                                 }
-    //                             ]
-    //                         }
-    //                 }
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         text: 'title3',
-    //         children: [
-    //             {
-    //                 text: 'title3-1'
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         text: 'title4'
-    //     }
-    // ]
-    this.lmenu.render(this.$router.options.routes)
-    this.lmenu.on('click', (e) => {
-        console.log(e)
-      if(!e.path){
-        return
-      }
-      if(e.type == 1){
-        return
-      }
-      if(e.path === me.$router.currentRoute.path){
-        return
-      }
-      console.log(me.$router.currentRoute)
-      me.$router.push(e.path)
-      this.lmenu.setActive(e.path)
-    })
+      this.$refs.menu.setActive(this.$router.currentRoute.path)
+    // let me = this
+    // console.log('process',process.env)
+    // this.lmenu = new LMenu({container: 'menuc',imgUrl:process.env.VUE_APP_STATIC_URL})
+    // this.lmenu.render(this.$router.options.routes)
+    // this.lmenu.on('click', (e) => {
+    //     console.log(e)
+    //   if(!e.path){
+    //     return
+    //   }
+    //   if(e.type == 1){
+    //     return
+    //   }
+    //   if(e.path === me.$router.currentRoute.path){
+    //     return
+    //   }
+    //   console.log(me.$router.currentRoute)
+    //   me.$router.push(e.path)
+    //   this.lmenu.setActive(e.path)
+    // })
   }
 }
 </script>

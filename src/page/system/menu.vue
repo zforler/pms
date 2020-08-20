@@ -17,22 +17,25 @@
             <el-table-column prop="type" label="类型"></el-table-column>
             <el-table-column prop="path" label="路由"></el-table-column>
             <el-table-column prop="filePath" label="文件路径"></el-table-column>
-            <el-table-column prop="icon" label="图标"></el-table-column>
+            <el-table-column prop="icon" label="图标">
+                <template slot-scope="scope">
+                    <svg-icon :icon-class="scope.row.icon" width="24px" height="24px"/>
+                </template>
+            </el-table-column>
             <el-table-column prop="hidden" label="是否可见"></el-table-column>
             <el-table-column prop="close" label="是否可关闭"></el-table-column>
             <el-table-column prop="level" label="等级等级"></el-table-column>
             <el-table-column label="操作">
                 <template slot-scope="scope">
-
+                    <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
+                    <i class="el-icon-share el-icon-table" @click="addSubHandler(scope.row)"></i>
+                    <i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>
                 </template>
             </el-table-column>
         </el-table>
 
-        <el-dialog :title="opFlag=='add'?'添加菜单':'编辑菜单'" :visible.sync="addDialogVisiable" @close="addClose" width="650px">
+        <el-dialog :title="opFlag=='add'?'添加菜单':'编辑菜单'" :visible.sync="addDialogVisiable" @close="addClose" width="580px">
             <el-form :model="addForm">
-                <el-form-item v-if="opFlag!=='add'" label="菜单编号" :label-width="formLabelWidth">
-                    <el-input disabled v-model="addForm.menuId" autocomplete="off"></el-input>
-                </el-form-item>
                 <el-form-item label="菜单名称" :label-width="formLabelWidth">
                     <el-input v-model="addForm.name" autocomplete="off"></el-input>
                 </el-form-item>
@@ -49,20 +52,29 @@
                 <el-form-item label="文件路径" :label-width="formLabelWidth">
                     <el-input v-model="addForm.filePath" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="图标" :label-width="formLabelWidth">
-                    <el-input v-model="addForm.icon" autocomplete="off"></el-input>
+                <el-form-item label="图标" prop="icon" :label-width="formLabelWidth">
+                    <el-autocomplete  v-model="addForm.icon" popper-class="icon-autocomplete"
+                                      :trigger-on-focus = "true" :fetch-suggestions="searchIcon"  :clearable = "true" @select="selectIcon">
+                        <i class="el-icon-edit el-input__icon" slot="suffix" @click="clickSearchIcon"></i>
+                        <template slot-scope="{ item }">
+                            <div >
+                                <svg-icon :icon-class="item"/>
+                                <span class="name">{{ item }}</span>
+                            </div>
+                        </template>
+                    </el-autocomplete>
                 </el-form-item>
                 <el-form-item label="是否可见" :label-width="formLabelWidth">
-                    <el-radio-group v-model="addForm.hidden">
-                        <el-radio label="是" value="1"></el-radio>
-                        <el-radio label="否" value="0"></el-radio>
-                    </el-radio-group>
+                    <el-select v-model="addForm.hidden" placeholder="请选是否可见">
+                        <el-option label="是" value="1"></el-option>
+                        <el-option label="否" value="0"></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="是否可关闭" :label-width="formLabelWidth">
-                    <el-radio-group v-model="addForm.close">
-                        <el-radio label="是" value="1"></el-radio>
-                        <el-radio label="否" value="0"></el-radio>
-                    </el-radio-group>
+                    <el-select v-model="addForm.close" placeholder="请选是否可关闭">
+                        <el-option label="是" value="1"></el-option>
+                        <el-option label="否" value="0"></el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="等级" :label-width="formLabelWidth">
                     <el-select v-model="addForm.level" placeholder="请选菜单类型">
@@ -81,6 +93,7 @@
 </template>
 
 <script>
+    import icons from '../svg-icons/generateIconsView'
     import { addMenu } from '../../api/menu'
     export default {
         name: "menulist",
@@ -88,6 +101,7 @@
             return {
                 searchValue: '',
                 addDialogVisiable: false,
+                innerVisible:false,
                 opFlag: 'add',
                 formLabelWidth: '120px',
                 tableData: [
@@ -96,22 +110,23 @@
                         name: '登录',
                         path: '/login',
                         filePath:  './page/index/index.vue',
-                        hidden: true,
+                        hidden: 1,
                     },
                   {
                       menuId:2,
                       name: '首页',
                       path: '/',
                       type: 1,
-                      hidden: true,
-                      close: false,
+                      hidden: 1,
+                      close: 0,
+                      icon: 'add',
                       children: [
                           {
                               menuId:3,
                               name: '首页',
                               path: '/index',
                               type: 2,
-                              icon: 'el-icon-s-home',
+                              icon: 'add',
                               meta: {close:false},
                               filePath: './page/index/index.vue'
                           }
@@ -129,10 +144,39 @@
                     icon: '',
                     level: ''
                 },
-                currentPage4: 4,
+                // 图标
+                iconsMap: [],
+                selectRow: ''
             }
         },
+        mounted(){
+          console.log(icons)
+            this.iconsMap = icons.state.iconsMap.map((i) => {
+                return i.default.id.substring(5)
+            })
+        },
         methods: {
+            // 查询图标
+            searchIcon(keyword, cb) {
+                const result = this.iconsMap
+                const results = keyword ? result.filter(this.createStateFilter(keyword)) : result;
+                clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => {
+                    cb(results);
+                }, 3000 * Math.random());
+                cb(results);
+            },
+            selectIcon(item) {
+                this.addForm.icon = item
+            },
+            clickSearchIcon() {
+                this.addForm.icon = ''
+            },
+            createStateFilter(queryString) {
+                return (state) => {
+                    return (state.toLowerCase().indexOf(queryString.toLowerCase()) >= 0);
+                };
+            },
             addHandler() {
                 this.opFlag = 'add'
                 this.addDialogVisiable = true
@@ -140,9 +184,15 @@
             addConfirm() {
                 console.log(this.addForm)
                 let menu = Object.assign({}, this.addForm)
-                menu.close = menu.close=='是'?1:0
-                menu.hidden = menu.hidden=='是'?1:0
-                delete menu.menuId
+                if(this.opFlag == 'add'){
+                    delete menu.menuId
+                    delete menu.parentId
+                }else if(this.opFlag == 'edit'){
+
+                }else if(this.opFlag == 'sub'){
+                    delete menu.menuId
+                }
+
                 addMenu(menu).then((res)=>{
                     console.log(res)
                     if(res.errorcode==0){
@@ -150,7 +200,7 @@
                             message: '添加成功',
                             type: 'success'
                         })
-                        this.dialogFormVisible = false
+                        this.addDialogVisiable = false
                     }else{
                         this.$message({
                             message: res.message,
@@ -172,12 +222,23 @@
                     level: ''
                 }
             },
-            handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
+            editHandler(row){
+                this.selectRow = row
+                this.opFlag = 'edit'
+                this.addForm = Object.assign({},row)
+                this.addForm.hidden = ''+this.addForm.hidden
+                this.addForm.close = ''+(this.addForm.close||0)
+                this.addDialogVisiable = true
             },
-            handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
+            addSubHandler(row){
+                this.selectRow = row
+                this.opFlag = 'sub'
+                this.addForm.parentId = row.menuId
+                this.addDialogVisiable = true
             },
+            delHandler(row){
+                this.selectRow = row
+            }
         }
     }
 </script>
@@ -186,6 +247,9 @@
     @import "../../styles/common";
     .menu-container {
         height: calc(100vh - 205px);
+        .el-input{
+            width: 350px;
+        }
     }
     .dataItem-l,.dataItem-r{
         float: left;

@@ -17,6 +17,15 @@ module.exports = {
             .options({
                 symbolId: 'icon-[name]'
             })
+
+        config.module.rule('images')
+            .test(/\.(png|jpe?g|gif|svg)(\?.*)?$/).exclude.add(path.resolve(__dirname, './src/icons')).end()
+            .use('url-loader')
+            .loader('file-loader')
+            .options({
+                // name: './img/[name].[hash:8].[ext]'
+                name: './img/[name].[ext]'
+            })
     },
     devServer: {
         // 配置代理
