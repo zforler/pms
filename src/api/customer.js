@@ -25,7 +25,7 @@ export function deleteCustomer(params) {
         params
     })
 }
-export function getCustomerList(params) {
+export function getCustomerList(params={}) {
     params.token = localCache.getToken()
     return request({
         url: '/getCustomerList',

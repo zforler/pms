@@ -32,7 +32,7 @@ module.exports = {
         proxy: {
             //代理接口前缀为/api的请求
             '/': {
-                target: 'http://127.0.0.1:8989', //需要代理到的目标地址
+                target: 'http://127.0.0.1:7903', //需要代理到的目标地址
                 // ws: true,
                 changOrigin: true, //是否跨域
                 pathRewrite: {

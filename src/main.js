@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from "vue-router";
+import store from "./util/store";
 import App from './App.vue';
 import * as filters from './util/filters';
 import Layout from "@/components/layout/Layout";
@@ -307,26 +308,7 @@ const router = new VueRouter({
 })
 // let _import = file => () => import('./page/' + file + '.vue')
 let _import = file => require('@/page/' + file + '.vue').default // vue-loader at least v13.0.0+
-// let k = 'report/report'
-// router.addRoutes([
-//     {
-//       name: '我的报表',
-//       path: '/',
-//       component: Layout,
-//       type: 1,
-//       icon: 'report',
-//       hidden: true,
-//       children: [
-//         {
-//           name: '我的报表',
-//           path: '/report',
-//           type: 2,
-//           icon: 'report',
-//           component:_import(k)
-//         }
-//       ]
-//     },
-// ])
+
 
 router.beforeEach((to, from, next) => {
     if(to.name != '登录'){
@@ -371,9 +353,6 @@ router.beforeEach((to, from, next) => {
     next()
 })
 
-function loadView(filePath){
-    return  ()=>import(filePath)
-}
 function createMenus(menus=[],res = []){
     let child = []
     for (let i = 0, len = menus.length; i < len; i++) {
@@ -403,5 +382,20 @@ function createMenus(menus=[],res = []){
 }
 new Vue({
   router,
+    store,
+    // data: {
+    //     eventHub: new Vue()
+    // },
   render: h => h(App),
 }).$mount('#app')
+// this.$root.eventHub.$emit('eventName', event.target);
+// created() {
+//     this.$root.eventHub.$on('eventName',(target) => {
+//         this.functionName(target)
+//     });
+// },
+// method:{
+//     functionName(target) {
+//         console.log(target);
+//     }
+// }

@@ -61,6 +61,7 @@
     import Pagination from '@/components/Pagination';
     import { addRole,updaterole,deleteRole,getRolePageList } from '../../api/role'
     import { findUserMenus,findUserConfigMenus } from '../../api/menu'
+    import localCache from "../../util/localCache";
 export default {
   name: "role",
     components: {
@@ -151,7 +152,7 @@ export default {
     },
       findUserMenus_(){
           findUserMenus({
-              userId:'00000000'
+              userId: localCache.getUser().userId
           }).then((res)=>{
               console.log(res.data)
               if(res.errorcode==0){
@@ -203,7 +204,7 @@ export default {
                   return
               }
               param.auth = arr.join(',')
-              param.customerId = '0000'
+              param.customerId = localCache.getCurrentCustomerId()
               if(this.opFlag=='add'){
                   addRole(param).then((res)=>{
                       if(res.errorcode==0){
@@ -241,7 +242,7 @@ export default {
       },
       getList() {
           this.listLoading = true
-          let param = Object.assign({customerId:'0000'}, this.listQuery)
+          let param = Object.assign({customerId:localCache.getCurrentCustomerId()}, this.listQuery)
           getRolePageList(param).then(res => {
               this.listLoading = false
               if (res.errorcode !== 0) {

@@ -73,6 +73,7 @@
     import Pagination from '@/components/Pagination';
     import { addUser,updateUser,getUserPageList } from '../../api/user'
     import { getRoleList } from '../../api/role'
+    import localCache from "../../util/localCache";
 export default {
 name: "user",
     components: {
@@ -124,6 +125,12 @@ name: "user",
         selectRow:''
     }
   },
+    computed:{
+        test(){
+            console.log(111)
+            return this.$store.state.count
+        }
+    },
     mounted(){
         this.getList()
     },
@@ -144,7 +151,7 @@ name: "user",
           }else if(this.opFlag == 'edit'){
               param.userId = this.selectRow.userId
           }
-          param.customerId = '0000'
+          param.customerId = localCache.getCurrentCustomerId()
           if(this.opFlag=='add'){
               addUser(param).then((res)=>{
                   if(res.errorcode==0){
@@ -210,7 +217,7 @@ name: "user",
     },
       getList() {
           this.listLoading = true
-          let param = Object.assign({customerId:'0000'}, this.listQuery)
+          let param = Object.assign({customerId:localCache.getCurrentCustomerId()}, this.listQuery)
           getUserPageList(param).then(res => {
               this.listLoading = false
               if (res.errorcode !== 0) {
@@ -226,7 +233,7 @@ name: "user",
 
       getRoleList_(){
           getRoleList({
-              customerId:'0000'
+              customerId:localCache.getUser().customerId
           }).then(res => {
               this.roleList = res.data
           }).catch(() => {

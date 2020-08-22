@@ -9,10 +9,18 @@
     <div class="l-right-container">
       <div class="l-right-top">
         <div class="l-right-top-company">
-          <h3>xxxgong公司</h3>
+            <el-select  :disabled="roleLevel>2" v-model="customerId" filterable @change="cumstomerChange">
+                <el-option
+                        v-for="item in companys"
+                        :key="item.customerId"
+                        :label="item.company"
+                        :value="item.customerId">
+                </el-option>
+            </el-select>
+            <!--<h3 v-else @click="changeConpany">xxxgong公司</h3>-->
         </div>
         <div class="l-right-top-user-c">
-          <div class="l-right-top-user" @click="userClick">系统管理员</div>
+          <div class="l-right-top-user" @click="userClick">{{userName}}</div>
           <ul :class="userOperation?'l-right-top-user-opetion' : 'l-right-top-user-opetion-show'">
             <li class="l-rtuo-item" @click="logout">退出</li>
           </ul>
@@ -36,12 +44,14 @@ import LMenu from "@/util/LMenu/LMenu";
 import Menu from "@/components/Menu/Menu";
 import LTabs from "@/components/layout/LTabs";
 import TabVIews from "@/components/layout/TabVIews";
+    import { getCustomerList } from '../../api/customer'
 export default {
 name: "Layout",
   data() {
     return {
-      lmenu: '',
       userOperation: false,
+        companys: [],
+        customerId:''
     }
   },
   components:{
@@ -49,6 +59,14 @@ name: "Layout",
     TabVIews,
       Menu
   },
+    computed:{
+        userName(){
+            return localCache.getUser().userName
+        },
+        roleLevel(){
+            return parseInt(localCache.getRole().level)
+        }
+    },
   watch: {
     $route(to, from) {
         // if(from.name=='登录'){
@@ -60,10 +78,14 @@ name: "Layout",
     }
   },
   activated() {
-    // this.lmenu.setActive(this.$router.currentRoute.path)
     //   this.$refs.menu.setActive(this.$router.currentRoute.path)
   },
   methods: {
+      cumstomerChange(current){
+        localCache.setCurrentCustomerId(current)
+          //todo 暂时先刷新页面
+          location.reload()
+      },
     view(mark){
       this.$router.replace('/' + mark)
     },
@@ -89,29 +111,20 @@ name: "Layout",
         }
         console.log(e.path)
         this.$router.push(e.path)
+      },
+      getCustomerList_(){
+          getCustomerList().then((res)=>{
+              if(res.errorcode == 0){
+                   this.companys = res.data
+              }
+          })
       }
   },
   mounted() {
+    this.customerId = localCache.getCurrentCustomerId()
       this.$refs.menu.setActive(this.$router.currentRoute.path)
-    // let me = this
-    // console.log('process',process.env)
-    // this.lmenu = new LMenu({container: 'menuc',imgUrl:process.env.VUE_APP_STATIC_URL})
-    // this.lmenu.render(this.$router.options.routes)
-    // this.lmenu.on('click', (e) => {
-    //     console.log(e)
-    //   if(!e.path){
-    //     return
-    //   }
-    //   if(e.type == 1){
-    //     return
-    //   }
-    //   if(e.path === me.$router.currentRoute.path){
-    //     return
-    //   }
-    //   console.log(me.$router.currentRoute)
-    //   me.$router.push(e.path)
-    //   this.lmenu.setActive(e.path)
-    // })
+      this.getCustomerList_()
+
   }
 }
 </script>
@@ -146,6 +159,7 @@ name: "Layout",
     align-items: center;
     border-bottom: #f0f0f0 thin solid;
     box-shadow: #ccc 5px 1px 10px;
+
   }
 
   .l-right-bcontainer{
@@ -189,4 +203,10 @@ name: "Layout",
   padding: 8px 0;
 }
 /*用户信息*/
+</style>
+<style>
+    .l-right-top .el-input__inner{
+        border: none !important;
+        font-size: 20px;
+    }
 </style>

@@ -21,7 +21,12 @@ class LocalCache{
     getUser(){
         return  JSON.parse(this.cache.getItem('user'))
     }
-
+    setRole(role={}){
+        this.cache.setItem('role', JSON.stringify(role))
+    }
+    getRole(){
+        return  JSON.parse(this.cache.getItem('role'))
+    }
     setMenus(menus){
         if(menus){
             this.cache.setItem('menus', JSON.stringify(menus))
@@ -37,6 +42,12 @@ class LocalCache{
 
     clearMenus(){
         this.cache.removeItem('menus')
+    }
+    setCurrentCustomerId(customerId){
+        this.cache.setItem('CurrentCustomerId',customerId)
+    }
+    getCurrentCustomerId(){
+       return this.cache.getItem('CurrentCustomerId')
     }
 }
 let localCache = new LocalCache();
