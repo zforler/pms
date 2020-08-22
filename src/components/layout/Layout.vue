@@ -51,6 +51,9 @@ name: "Layout",
   },
   watch: {
     $route(to, from) {
+        // if(from.name=='登录'){
+        //     this.$refs.menu.render()
+        // }
       // 对路由变化作出响应...
       // this.lmenu.setActive(to.path)
         this.$refs.menu.setActive(to.path)
@@ -62,25 +65,29 @@ name: "Layout",
   },
   methods: {
     view(mark){
-      this.$router.push('/' + mark)
+      this.$router.replace('/' + mark)
     },
     userClick() {
       this.userOperation = !this.userOperation
     },
       logout(){
           localCache.deleteToken()
-          this.$router.push({path: '/login'})
+          this.$router.replace({path: '/login'})
+          location.reload();
       },
       clickHandler(e){
+        console.log(e)
         if(!e.path){
           return
         }
         if(e.type == 1){
           return
         }
+
         if(e.path === this.$router.currentRoute.path){
           return
         }
+        console.log(e.path)
         this.$router.push(e.path)
       }
   },

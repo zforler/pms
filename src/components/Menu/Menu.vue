@@ -25,6 +25,8 @@
 </template>
 
 <script>
+    import localCache from "../../util/localCache";
+
     export default {
         name: "Menu",
         data(){
@@ -39,10 +41,15 @@
           clickHandler:Function
         },
         mounted(){
-          this.flatMenuCache = this._flatJson(this.$router.options.routes)
-            console.log(this.flatMenuCache)
+          // this.flatMenuCache = this._flatJson(this.$router.options.routes)
+            console.log(localCache.getMenus())
+            this.flatMenuCache = this._flatJson(localCache.getMenus())
+            // console.log(this.$router.options.routes)
         },
         methods:{
+            render(){
+                this.flatMenuCache = this._flatJson(this.$router.options.routes)
+            },
             setActive(value, type='path') {
                 for(let key in this.flatMenuCache){
                     let val = this.flatMenuCache[key]
@@ -132,6 +139,9 @@
                     }
                 }
                 return arr
+            },
+            _isObject(o){
+                return Object.prototype.toString.call(o) === '[object Object]'
             }
         }
     }

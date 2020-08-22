@@ -1,19 +1,18 @@
 <template>
   <div class="customer-container">
     <div class="t-top-bar">
-      <el-input placeholder="全内容检索" v-model="searchValue" class="input-with-select search-input">
-        <el-button  slot="append"  type="primary" icon="el-icon-search">搜索</el-button>
+      <el-input placeholder="全内容检索" v-model="listQuery.keyword" class="input-with-select search-input">
+        <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getList">搜索</el-button>
       </el-input>
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
-    <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="date" label="客户编号" width="80"></el-table-column>
-      <el-table-column prop="name" label="公司名称"></el-table-column>
+    <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
+      <el-table-column prop="customerId" label="客户编号" width="80"></el-table-column>
+      <el-table-column prop="company" label="公司名称"></el-table-column>
       <el-table-column prop="address" label="公司地址"></el-table-column>
-      <el-table-column prop="name" label="公司负责人"></el-table-column>
-      <el-table-column prop="name" label="联系方式"></el-table-column>
-      <el-table-column prop="name" label="对接人"></el-table-column>
-      <el-table-column prop="concatPhone" label="对接人联系方式"></el-table-column>
+      <el-table-column prop="concator" label="公司负责人"></el-table-column>
+      <el-table-column prop="concatorPhone" label="联系方式"></el-table-column>
+        <el-table-column prop="equipmentCount" label="设备数量"></el-table-column>
       <el-table-column label="操作" width="80">
         <template slot-scope="scope">
           <el-tooltip content="客户信息编辑" placement="top">
@@ -22,44 +21,28 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
-    </el-pagination>
+    <!-- 分页组件 -->
+    <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.size" @pagination="getList" />
 
 
-    <el-dialog :title="dialogMark=='add'?'添加客户信息':'编辑客户信息'" :visible.sync="addDialogVisiable" width="650px">
-      <el-form :model="addForm">
-        <el-form-item v-if="dialogMark=='edit'" label="客户编号" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off" disabled></el-input>
+    <el-dialog :title="opFlag=='add'?'添加客户信息':'编辑客户信息'" @close="addCloseHandler" :visible.sync="addDialogVisiable" width="650px">
+      <el-form :model="addForm":rules="rules" ref="addForm">
+        <el-form-item label="公司名称" prop="company" :label-width="formLabelWidth">
+          <el-input v-model="addForm.company" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="公司名称" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+        <el-form-item label="公司地址" prop="address"  :label-width="formLabelWidth">
+          <el-input v-model="addForm.address" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="公司地址" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+        <el-form-item label="公司负责人" prop="concator"  :label-width="formLabelWidth">
+          <el-input v-model="addForm.concator" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="公司负责人" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="联系方式" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="对接人" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="对接人联系方式" :label-width="formLabelWidth">
-          <el-input v-model="addForm.concatPhone" autocomplete="off"></el-input>
+        <el-form-item label="联系方式" prop="concatorPhone"  :label-width="formLabelWidth">
+          <el-input v-model="addForm.concatorPhone" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="addDialogVisiable = false">取 消</el-button>
-        <el-button type="primary" @click="addDialogVisiable = false">确 定</el-button>
+        <el-button type="primary" @click="addConfirm">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -67,56 +50,137 @@
 </template>
 
 <script>
+    import Pagination from '@/components/Pagination';
+    import { addCustomer,updateCustomer,getCustomerPageList } from '../../api/customer'
 export default {
 name: "customer",
+    components: {
+        Pagination,
+    },
   data() {
     return {
-      searchValue: '',
       addDialogVisiable: false,
-      dialogMark: 'add',
+      opFlag: 'add',
       formLabelWidth: '120px',
-      tableData: [{
-        date: '0001',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        concatPhone: '18363000394'
-      }, {
-        date: '0002',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄',
-        concatPhone: '18363000394'
-      }, {
-        date: '0002',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄',
-        concatPhone: '18363000394'
-      }],
+      tableData: [],
       addForm: {
-        date: '0002',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄',
-        concatPhone: '18363000394'
+          company: '',
+          address: '',
+          concator: '',
+          concatorPhone: ''
       },
-      currentPage4: 4,
+        rules: {
+            company: [
+                { required: true, message: '公司名不能为空', trigger: 'blur' },
+                { min: 3, max: 15, message: '长度在 3 到 64 个字符', trigger: 'blur' }
+            ],
+            address: [
+                { required: true, message: '地址不能为空', trigger: 'blur' },
+                { min: 3, max: 8, message: '长度在 3 到 100 个字符', trigger: 'blur' }
+            ],
+            concator: [
+                { required: true, message: '联系人不能为空', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+            ],
+            concatorPhone: [
+                { required: true, message: '联系方式', trigger: 'blur' },
+                { min: 3, max: 25, message: '长度在 3 到 25 个字符', trigger: 'blur' }
+            ],
+        },
+        listQuery: {
+            page: 1,
+            size: 10,
+            keyword: ''
+        },
+        total: 0,
+        listLoading: true,
       selectRow: ''
     }
   },
+    mounted(){
+        this.getList()
+    },
   methods: {
+      addCloseHandler(){
+          this.$refs['addForm'].resetFields()
+          this.addForm =  {
+              company: '',
+              address: '',
+              concator: '',
+              concatorPhone: ''
+          }
+      },
     addHandler() {
-      this.dialogMark='add'
+      this.opFlag='add'
       this.addDialogVisiable = true
     },
     editHandler(row) {
       this.selectRow = row
-      this.dialogMark='edit'
+      this.opFlag='edit'
+        this.addForm = Object.assign({}, row)
       this.addDialogVisiable = true
     },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    }
+      addConfirm() {
+          this.$refs['addForm'].validate((valid) => {
+              if (!valid) {
+                  return
+              }
+              let param = Object.assign({}, this.addForm)
+              if(this.opFlag == 'add'){
+                  delete param.customerId
+              }else if(this.opFlag == 'edit'){
+                  param.customerId = this.selectRow.customerId
+              }
+
+              if(this.opFlag=='add'){
+                  addCustomer(param).then((res)=>{
+                      if(res.errorcode==0){
+                          this.$message({
+                              message: '添加成功',
+                              type: 'success'
+                          })
+                          this.addDialogVisiable = false
+                          this.getList()
+                      }else{
+                          this.$message({
+                              message: res.message,
+                              type: 'error'
+                          })
+                      }
+                  })
+              }else{
+                  updateCustomer(param).then((res)=>{
+                      if(res.errorcode==0){
+                          this.$message({
+                              message: '修改成功',
+                              type: 'success'
+                          })
+                          this.addDialogVisiable = false
+                          this.getList()
+                      }else{
+                          this.$message({
+                              message: res.message,
+                              type: 'error'
+                          })
+                      }
+                  })
+              }
+          });
+      },
+      getList() {
+          this.listLoading = true
+          getCustomerPageList(this.listQuery).then(res => {
+              this.listLoading = false
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.tableData = res.data.content
+                  this.total = res.data.total
+              }
+          }).catch(() => {
+              this.listLoading = false
+          })
+      },
   }
 }
 </script>

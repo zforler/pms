@@ -105,6 +105,7 @@ export default {
     },
   methods: {
     addHandler() {
+        this.opFlag = 'add'
         this.findUserMenus_()
       this.addDialogVisiable = true
     },

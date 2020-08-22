@@ -7,7 +7,7 @@
           <el-input v-model="ruleForm.userName" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="pass">
-          <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
+          <el-input type="password" v-model="ruleForm.password" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item class="login-btn">
           <el-button type="primary" @click="submitForm('ruleForm')">登陆</el-button>
@@ -24,53 +24,19 @@ import {login} from '../../api/user'
 export default {
 name: "login",
   data() {
-    var checkAge = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('年龄不能为空'));
-      }
-      setTimeout(() => {
-        if (!Number.isInteger(value)) {
-          callback(new Error('请输入数字值'));
-        } else {
-          if (value < 18) {
-            callback(new Error('必须年满18岁'));
-          } else {
-            callback();
-          }
-        }
-      }, 1000);
-    };
-    var validatePass = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入密码'));
-      } else {
-        if (this.ruleForm.checkPass !== '') {
-          this.$refs.ruleForm.validateField('checkPass');
-        }
-        callback();
-      }
-    };
-    var validatePass2 = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请再次输入密码'));
-      } else if (value !== this.ruleForm.pass) {
-        callback(new Error('两次输入密码不一致!'));
-      } else {
-        callback();
-      }
-    };
     return {
       ruleForm: {
         userName: '',
-        pass: '',
-        checkPass: ''
+          password: '',
       },
       rules: {
-        pass: [
-          { validator: validatePass, trigger: 'blur' }
+          userName: [
+              { required: true, trigger: 'blur' },
+              { min: 3, max: 16, message: '长度在 3 到 16 个字符', trigger: 'blur' }
         ],
-        checkPass: [
-          { validator: validatePass2, trigger: 'blur' }
+          password: [
+              { required: true, trigger: 'blur' },
+              { min: 8, max: 16, message: '长度在 3 到 16 个字符', trigger: 'blur' }
         ]
       }
     };
@@ -79,17 +45,23 @@ name: "login",
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          login({
-            a:'a'
+          login(this.ruleForm).then((res)=>{
+              if(res.errorcode==0){
+                  console.log(res)
+                  let data = res.data
+
+                  localCache.setToken(data.token)
+                  localCache.setUser(data.user)
+                  localCache.clearMenus()
+                  this.$router.push({path: '/index'})
+              }else{
+                  this.$message({
+                      message: res.message,
+                      type: 'error'
+                  })
+              }
           })
-            let userInfo = {
-              userName: 'admin',
-            }
-            localCache.setToken('admin')
-            this.$router.push({path: '/index'})
-        } else {
-          console.log('error submit!!');
-          return false;
+
         }
       });
     },
