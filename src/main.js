@@ -336,9 +336,12 @@ router.beforeEach((to, from, next) => {
             next({ path: '/login' })
             return false
         }
+        if(to.path == '/'){
+            next({ path: '/index' })
+            return false
+        }
 
         let menus = localCache.getMenus()
-        console.log("aaaaaa",menus)
         window.onbeforeunload = function() {
             if(menus){
                 localCache.clearMenus()
