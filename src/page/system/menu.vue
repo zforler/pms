@@ -200,6 +200,8 @@
                 this.selectRow = row
                 this.opFlag = 'edit'
                 this.addForm = Object.assign({},row)
+                this.addForm.type = ''+row.type
+                this.addForm.level = ''+row.level
                 this.addForm.hidden = ''+this.addForm.hidden
                 this.addForm.close = ''+(this.addForm.close||0)
                 this.addDialogVisiable = true

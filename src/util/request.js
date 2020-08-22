@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Message, MessageBox } from 'element-ui'
+import localCache from '../util/localCache';
 // import store from '@/store'
 // import { getToken } from '@/utils/auth'
 import qs from 'qs'
@@ -23,7 +24,7 @@ console.log(process.env.BASE_API)
 // request interceptor
 service.interceptors.request.use(config => {
     // 让每个请求携带token-- ['X-Token']为自定义key 请根据实际情况自行修改
-    // config.headers['x-token'] = getToken()
+    config.headers['x-token'] = localCache.getToken()
     // 以表单的形式提交数据
     let header = config.headers['Content-Type']
     if (!header) {

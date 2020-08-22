@@ -6,7 +6,7 @@ import Layout from "@/components/layout/Layout";
 import login from "@/page/login/login";
 import Company from "@/components/Company/Company";
 import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree,Tooltip,Radio,RadioGroup,
-    Message,Autocomplete} from "element-ui";
+    Message,Autocomplete,Loading} from "element-ui";
 import './icons';
 import localCache from "./util/localCache";
 import Menu from '@/components/Menu/Menu'
@@ -35,6 +35,7 @@ Vue.use(Radio)
 Vue.use(RadioGroup)
 Vue.prototype.$message = Message;
 Vue.use(Autocomplete)
+Vue.use(Loading)
 
 const temp = {
   template: `<router-view></router-view>`

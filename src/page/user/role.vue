@@ -1,16 +1,24 @@
 <template>
   <div class="role-container">
     <div class="t-top-bar">
-      <el-input placeholder="请输入内容" v-model="searchValue" class="input-with-select search-input">
-        <el-button  slot="append"  type="primary" icon="el-icon-search">搜索</el-button>
+      <el-input placeholder="请输入内容" v-model="listQuery.keyword" class="input-with-select search-input">
+        <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getList">搜索</el-button>
       </el-input>
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
-    <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="date" label="角色编号" width="80"></el-table-column>
-      <el-table-column prop="name" label="角色名称" width="180"></el-table-column>
-      <el-table-column prop="name" label="添加时间"></el-table-column>
-      <el-table-column prop="name" label="修改时间"></el-table-column>
+    <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
+      <el-table-column prop="roleId" label="角色编号" width="100"></el-table-column>
+      <el-table-column prop="roleName" label="角色名称" width="180"></el-table-column>
+      <el-table-column prop="createTime" label="添加时间">
+          <template slot-scope="scope">
+            {{scope.row.createTime | formateTime()}}
+          </template>
+      </el-table-column>
+      <el-table-column prop="updateTime" label="修改时间">
+          <template slot-scope="scope">
+              {{scope.row.updateTime | formateTime()}}
+          </template>
+      </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
@@ -18,32 +26,24 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
-    </el-pagination>
+    <!-- 分页组件 -->
+    <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.size" @pagination="getList" />
 
 
-    <el-dialog title="添加角色" :visible.sync="addDialogVisiable" width="650px">
-      <el-form :model="addForm">
-        <el-form-item label="角色名称" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+    <el-dialog :title="opFlag=='add'?'添加角色':'修改角色'" :visible.sync="addDialogVisiable" @close="addClose" width="650px">
+      <el-form :model="addForm":rules="rules" ref="addForm">
+        <el-form-item label="角色名称" prop="roleName" :label-width="formLabelWidth">
+          <el-input v-model="addForm.roleName" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="权限设置" :label-width="formLabelWidth">
           <div class="add-role-auth-tree">
-            <el-tree  show-checkbox :data="treeData" :props="defaultTree" @node-click="handleNodeClick"></el-tree>
+            <el-tree ref="tree"node-key="menuId" :default-checked-keys="defaultCheckedKeys"  show-checkbox :data="treeData" :props="defaultTree" @node-click="handleNodeClick"></el-tree>
           </div>
-
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button @click="addDialogVisiable = false">取 消</el-button>
+        <el-button type="primary" @click="addConfirm">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -51,116 +51,210 @@
       <span>确定删除此角色信息?</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="confirmVisible = false">取 消</el-button>
-        <el-button type="primary" @click="confirmVisible = false">确 定</el-button>
+        <el-button type="primary" @click="confirmCloseHandler">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
+    import Pagination from '@/components/Pagination';
+    import { addRole,updaterole,deleteRole,getRolePageList } from '../../api/role'
+    import { findUserMenus,findUserConfigMenus } from '../../api/menu'
 export default {
   name: "role",
+    components: {
+        Pagination,
+    },
   data() {
     return {
       searchValue: '',
       addDialogVisiable: false,
       confirmVisible: false,
       formLabelWidth: '120px',
-      tableData: [{
-        date: '0001',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        status: 0,
-      }, {
-        date: '0002',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄',
-        status: 0,
-      }, {
-        date: '0002',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄',
-        status: 0,
-      }, {
-        date: '0004',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄',
-        status: 0,
-      }],
+      tableData: [],
       addForm: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+          roleName: '',
+        auth: '',
+         customerId:''
       },
-      currentPage4: 4,
-      treeData: [{
-        label: '一级 1',
-        children: [{
-          label: '二级 1-1',
-          children: [{
-            label: '三级 1-1-1'
-          }]
-        }]
-      }, {
-        label: '一级 2',
-        children: [{
-          label: '二级 2-1',
-          children: [{
-            label: '三级 2-1-1'
-          }]
-        }, {
-          label: '二级 2-2',
-          children: [{
-            label: '三级 2-2-1'
-          }]
-        }]
-      }, {
-        label: '一级 3',
-        children: [{
-          label: '二级 3-1',
-          children: [{
-            label: '三级 3-1-1'
-          }]
-        }, {
-          label: '二级 3-2',
-          children: [{
-            label: '三级 3-2-1'
-          }]
-        }]
-      }],
+        rules: {
+            roleName: [
+                { required: true, message: '角色名称不能为空', trigger: 'blur' }
+            ],
+        },
+      treeData: [],
       defaultTree: {
         children: 'children',
-        label: 'label'
+        label: 'name'
       },
+        defaultCheckedKeys:[],
+        listQuery: {
+            page: 1,
+            size: 10,
+            keyword: ''
+        },
+        total: 0,
+        listLoading: true,
+        opFlag:'add',
+        selectRow: ''
     }
   },
+    mounted(){
+      this.getList()
+    },
   methods: {
     addHandler() {
+        this.findUserMenus_()
       this.addDialogVisiable = true
     },
+      addClose(){
+          this.$refs['addForm'].resetFields()
+        this.defaultCheckedKeys = []
+          this.addForm = {
+              roleName: '',
+              auth: '',
+              customerId:''
+          }
+      },
     editHandler(row) {
-      this.addDialogVisiable = true
+        this.selectRow = row
+        this.opFlag = 'edit'
+        this.addForm.roleName = row.roleName
+        this.findUserConfigMenus_()
+
     },
     delHandler(row){
+        this.selectRow = row
       this.confirmVisible = true
     },
 
     confirmCloseHandler() {
-
+        deleteRole({
+            roleId: this.selectRow.roleId
+        }).then((res)=>{
+            if(res.errorcode==0){
+                this.$message({
+                    message: '删除成功',
+                    type: 'success'
+                })
+                this.confirmVisible = false
+                this.getList()
+            }else{
+                this.$message({
+                    message: res.message,
+                    type: 'error'
+                })
+            }
+        })
     },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    },
+      findUserMenus_(){
+          findUserMenus({
+              userId:'00000000'
+          }).then((res)=>{
+              console.log(res.data)
+              if(res.errorcode==0){
+                  this.treeData = res.data
+              }
+          })
+      },
+      findUserConfigMenus_(){
+          findUserConfigMenus({
+              roleId: this.selectRow.roleId
+          }).then((res)=>{
+              if(res.errorcode==0){
+                  this.treeData = res.data
+                  this.addDialogVisiable = true
+                  let arr = []
+                  this.setCheckKeys(arr,res.data)
+                  this.defaultCheckedKeys = arr
+                  console.log(arr)
+              }
+          })
+      },
+      setCheckKeys(arr=[],treeData){
+          for (let i = 0,len=treeData.length; i < len; i++) {
+              if(treeData[i].authed == 1){
+                  arr.push(treeData[i].menuId)
+              }
+              if(treeData[i].children){
+                  this.setCheckKeys(arr,treeData[i].children)
+              }
+          }
+      },
+      addConfirm() {
+          this.$refs['addForm'].validate((valid) => {
+              if (!valid) {
+                  return
+              }
+              let param = Object.assign({}, this.addForm)
+              if(this.opFlag == 'add'){
+                  delete param.roleId
+              }else if(this.opFlag == 'edit'){
+                  param.roleId = this.selectRow.roleId
+              }
+              let arr = this.$refs.tree.getCheckedKeys()
+              if(arr.length == 0){
+                  this.$message({
+                      message: '请选择权限',
+                      type: 'error'
+                  })
+                  return
+              }
+              param.auth = arr.join(',')
+              param.customerId = '0000'
+              if(this.opFlag=='add'){
+                  addRole(param).then((res)=>{
+                      if(res.errorcode==0){
+                          this.$message({
+                              message: '添加成功',
+                              type: 'success'
+                          })
+                          this.addDialogVisiable = false
+                          this.getList()
+                      }else{
+                          this.$message({
+                              message: res.message,
+                              type: 'error'
+                          })
+                      }
+                  })
+              }else{
+                  updaterole(param).then((res)=>{
+                      if(res.errorcode==0){
+                          this.$message({
+                              message: '修改成功',
+                              type: 'success'
+                          })
+                          this.addDialogVisiable = false
+                          this.getList()
+                      }else{
+                          this.$message({
+                              message: res.message,
+                              type: 'error'
+                          })
+                      }
+                  })
+              }
+          });
+      },
+      getList() {
+          this.listLoading = true
+          let param = Object.assign({customerId:'0000'}, this.listQuery)
+          getRolePageList(param).then(res => {
+              this.listLoading = false
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.tableData = res.data.content
+                  this.total = res.data.total
+              }
+          }).catch(() => {
+              this.listLoading = false
+          })
+      },
     handleNodeClick(data) {
-      console.log(data);
+      console.log(this.$refs.tree.getCheckedKeys());
     },
   }
 }

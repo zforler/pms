@@ -12,8 +12,8 @@ name: "TabVIews"
 </script>
 
 <style lang="scss" scoped>
-  .l-tabviews{
-    min-height: calc(100vh - 156px);
-  }
+  /*.l-tabviews{*/
+    /*min-height: calc(100vh - 156px);*/
+  /*}*/
 
 </style>

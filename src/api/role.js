@@ -1,35 +1,42 @@
 import request from '@/util/request'
 import localCache from '../util/localCache';
 // 登陆
-export function login(params) {
+export function addRole(params) {
     params.token = localCache.getToken()
     return request({
-        url: '/login',
+        url: '/role',
         method: 'post',
         params
     })
 }
-
-export function addUser(params) {
+export function updaterole(params) {
     params.token = localCache.getToken()
     return request({
-        url: '/user',
+        url: '/updaterole',
         method: 'post',
         params
     })
 }
-export function updateUser(params) {
+export function deleteRole(params) {
     params.token = localCache.getToken()
     return request({
-        url: '/updateUser',
+        url: '/deleteRole',
         method: 'post',
         params
     })
 }
-export function getUserPageList(params) {
+export function getRoleList(params) {
     params.token = localCache.getToken()
     return request({
-        url: '/getUserPageList',
+        url: '/getRoleList',
+        method: 'get',
+        params
+    })
+}
+export function getRolePageList(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getRolePageList',
         method: 'get',
         params
     })
