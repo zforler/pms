@@ -3,20 +3,56 @@ import Vuex from 'vuex';
 
 
 Vue.use(Vuex)
-
-const store = new Vuex.Store({
+const dic = {
     state: {
-        count: 0
+        dic: null
     },
+
     mutations: {
-        increment (state) {
-            state.count++
+        // 设置数据字典
+        SET_DIC: (state, dic) => {
+            state.dic = dic
         }
     },
+
     actions: {
-        increment (context) {
-            context.commit('increment')
+        saveDic({ commit }, dic) {
+            commit('SET_DIC', dic)
         }
+    },
+    getters: {
+        dic (state) {
+            return state.dic
+        }
+    }
+}
+const dicFilter = {
+    state: {
+        dicFilter: {}
+    },
+
+    mutations: {
+        // 设置数据字典
+        SET_DIC_F: (state, dic) => {
+            state.dicFilter = dic
+        }
+    },
+
+    actions: {
+        saveDicFilter({ commit }, dic) {
+            commit('SET_DIC_F', dic)
+        }
+    },
+    getters: {
+        dicFilter (state) {
+            return state.dicFilter
+        }
+    }
+}
+const store = new Vuex.Store({
+    modules: {
+        dic,
+        dicFilter
     }
 })
 export default store

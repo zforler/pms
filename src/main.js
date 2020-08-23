@@ -11,7 +11,8 @@ import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagin
 import './icons';
 import localCache from "./util/localCache";
 import { findUserMenus } from '@/api/menu'
-import Menu from '@/components/Menu/Menu'
+
+
 
 // const _import = require('./_import_' + process.env.NODE_ENV)
 
@@ -357,6 +358,10 @@ function createMenus(menus=[],res = []){
     let child = []
     for (let i = 0, len = menus.length; i < len; i++) {
         let m = menus[i]
+        if(m.type == 3){
+            child.push(m)
+            continue
+        }
         let t = {
             name: m.name,
             path: m.path,
@@ -380,6 +385,17 @@ function createMenus(menus=[],res = []){
     }
     return child
 }
+
+Vue.prototype.authedCheck = function (button) {
+    let menuStr = localCache.getMenusStr()
+    let reg = new RegExp(button)
+    return reg.test(menuStr)
+}
+Vue.prototype.selectDic = function (code) {
+    return store.getters.dic&&store.getters.dic[code]&&store.getters.dic[code].children
+}
+
+
 new Vue({
   router,
     store,

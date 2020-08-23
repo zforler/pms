@@ -2,15 +2,15 @@
     <div class="menu-container">
         <ul id="LMenu">
             <template v-for="(val,key) in flatMenuCache">
-                <li :data-level="(flatMenuCache[val._parentId]&&flatMenuCache[val._parentId].hidden)?1:val._level"
+                <li v-if="val.type!==3" :data-level="(flatMenuCache[val._parentId]&&flatMenuCache[val._parentId].hidden)?1:val._level"
                     class="L-item"
                     v-bind:class="{'L-item-hidden':val.hidden,'L-item-open':val.open,'L-item-extend':val.extend,
                     'L-item-active':val.active}"
                     @click="menuClick(val)" :key="key">
                     <svg-icon v-if="val.icon" :icon-class="val.icon"  width="24px" height="24px"></svg-icon>
                     <span class="L-item-name">{{val.name}}</span>
-                    <i v-if="val.children" class="el-icon-arrow-right L-item-c"></i>
-                    <i  v-if="val.children" class="el-icon-arrow-down L-item-o"></i>
+                    <i v-if="val.children && val.type==1" class="el-icon-arrow-right L-item-c"></i>
+                    <i  v-if="val.children && val.type==1" class="el-icon-arrow-down L-item-o"></i>
 
                 </li>
             </template>
@@ -68,7 +68,7 @@
                 let childs = this.menuCache[id]
                 let targetJson = this.flatMenuCache[item._id]
                 console.log(childs)
-                if(childs){
+                if(childs && item.type==1){
                     if(targetJson.extend == true){
                         this.flodUp(item._id)
                         this.flatMenuCache[item._id].open = false;

@@ -234,18 +234,6 @@
             width: 350px;
         }
     }
-    .dataItem-l,.dataItem-r{
-        float: left;
-        width: 50%;
-        height: 100%;
-    }
-    .dataItem-l{
-        padding-right: $p-25;
-    }
-    .dataItem-r{
-        padding-left: $p-25;
-        border-left:#ccc thin solid;
-    }
     .t-top-bar{
         margin-bottom: 15px;
     }
@@ -257,9 +245,5 @@
         float: right;
         cursor: pointer;
     }
-    .dataItem-r-title{
-        display: inline-block;
-        line-height: 40px;
-        font-size: 20px;
-    }
+
 </style>

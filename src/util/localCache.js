@@ -39,7 +39,9 @@ class LocalCache{
         }
         return null
     }
-
+    getMenusStr(){
+        return this.cache.getItem('menus')
+    }
     clearMenus(){
         this.cache.removeItem('menus')
     }

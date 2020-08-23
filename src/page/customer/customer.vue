@@ -4,7 +4,7 @@
       <el-input placeholder="全内容检索" v-model="listQuery.keyword" class="input-with-select search-input">
         <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getList">搜索</el-button>
       </el-input>
-      <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
+      <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加客户')" @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
       <el-table-column prop="customerId" label="客户编号" width="80"></el-table-column>

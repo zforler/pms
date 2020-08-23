@@ -12,7 +12,7 @@
       <el-table-column prop="realName" label="用户姓名"></el-table-column>
       <el-table-column prop="sex" label="性别">
           <template slot-scope="scope">
-              {{scope.row.sex==1?'男':'女'}}
+              {{scope.row.sex | dicFilter('SEX')}}
           </template>
       </el-table-column>
       <el-table-column prop="phone" label="联系方式"></el-table-column>
@@ -40,8 +40,7 @@
         </el-form-item>
         <el-form-item label="性别" prop="sex" :label-width="formLabelWidth">
             <el-select v-model="addForm.sex" placeholder="请选是否可见">
-                <el-option label="男" value="1"></el-option>
-                <el-option label="女" value="2"></el-option>
+                <el-option v-for="(val,key) in selectDic('SEX')" :key="key" :label="val.name" :value="val.code"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="联系方式" prop="phone" :label-width="formLabelWidth">

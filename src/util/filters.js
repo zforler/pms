@@ -1,5 +1,5 @@
-
-
+import localcache from './localCache'
+import store from './store';
 let DateFormat = {
     date: new Date(),
     YEAR: 0,
@@ -80,4 +80,8 @@ export function formateTime(timestamp, reg='yyyy-MM-dd hh:mm:ss'){
     str = str.replace(/nnn|NNN/, milliSecond < 10 ? '00' + milliSecond : milliSecond < 100 ? '0' + milliSecond : milliSecond)
     str = str.replace(/n|N/, milliSecond)
     return str
+}
+
+export function dicFilter(value,type) {
+    return store.getters.dicFilter[type+value]
 }
