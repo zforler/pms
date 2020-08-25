@@ -28,9 +28,7 @@ class LocalCache{
         return  JSON.parse(this.cache.getItem('role'))
     }
     setMenus(menus){
-        if(menus){
-            this.cache.setItem('menus', JSON.stringify(menus))
-        }
+        this.cache.setItem('menus', JSON.stringify(menus))
     }
     getMenus(){
         let menus = this.cache.getItem('menus')
@@ -41,6 +39,21 @@ class LocalCache{
     }
     getMenusStr(){
         return this.cache.getItem('menus')
+    }
+    setMenusArr(menus){
+        if(menus){
+            this.cache.setItem('menusArr', JSON.stringify(menus))
+        }else{
+            this.cache.removeItem('menusArr')
+        }
+
+    }
+    getMenusArr(){
+        let menus = this.cache.getItem('menusArr')
+        if(menus){
+            return JSON.parse(menus)
+        }
+        return null
     }
     clearMenus(){
         this.cache.removeItem('menus')

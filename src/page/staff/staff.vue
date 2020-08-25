@@ -18,8 +18,6 @@
       <el-table-column prop="name" label="联系方式" width="100"></el-table-column>
       <el-table-column prop="address" label="员工住址" width="280"></el-table-column>
       <el-table-column prop="name" label="身份证号" width="150"></el-table-column>
-      <el-table-column prop="name" label="添加时间" width="130"></el-table-column>
-      <el-table-column prop="name" label="修改时间" width="130"></el-table-column>
       <el-table-column fixed="right" width="140" label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>

@@ -79,6 +79,7 @@ name: "Layout",
   },
   activated() {
     //   this.$refs.menu.setActive(this.$router.currentRoute.path)
+      console.log('44444')
   },
   methods: {
       cumstomerChange(current){
@@ -121,6 +122,7 @@ name: "Layout",
       }
   },
   mounted() {
+    console.log('layout')
     this.customerId = localCache.getCurrentCustomerId()
       this.$refs.menu.setActive(this.$router.currentRoute.path)
       this.getCustomerList_()

@@ -100,7 +100,7 @@ name: "user",
             ],
             realName: [
                 { required: true, message: '用户姓名名不能为空', trigger: 'blur' },
-                { min: 3, max: 8, message: '长度在 3 到 15 个字符', trigger: 'blur' }
+                { min: 3, max: 8, message: '长度在 3 到 8 个字符', trigger: 'blur' }
             ],
             sex: [
                 { required: true, message: '请选择性别', trigger: 'blur' }

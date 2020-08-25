@@ -312,14 +312,17 @@ let _import = file => require('@/page/' + file + '.vue').default // vue-loader a
 
 
 router.beforeEach((to, from, next) => {
+    console.log(123111)
     if(to.name != '登录'){
         let token = localCache.getToken();
         console.log('token', token)
         if(!token){
+            console.log(12311111)
             next({ path: '/login' })
             return false
         }
         if(to.path == '/'){
+            console.log(123111111)
             next({ path: '/index' })
             return false
         }
@@ -338,6 +341,7 @@ router.beforeEach((to, from, next) => {
                     let arr = []
                     createMenus(res.data, arr)
                     localCache.setMenus(arr)
+                    localCache.setMenusArr(res.data)
                     router.addRoutes(arr)
                     router.options.routes=arr
                     next({
@@ -347,10 +351,33 @@ router.beforeEach((to, from, next) => {
                 }
             })
         }else{
+            // let arr = []
+            // createMenus(res.data, arr)
+            // router.addRoutes(menus)
+            // router.options.routes=menus
+            // next({
+            //     ...to,
+            //     replace:true
+            // })
+            let menuArr = localCache.getMenusArr()
+            let flag = window.flag
+            if(!flag){
+                window.flag = true
+                let arr = []
+                createMenus(menuArr, arr)
+                localCache.setMenus(arr)
+                router.addRoutes(arr)
+                router.options.routes=arr
+                next({
+                    ...to,
+                    replace:true
+                })
+                console.log(123333)
+            }
 
         }
     }
-
+    console.log(1344)
     next()
 })
 

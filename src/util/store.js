@@ -49,10 +49,34 @@ const dicFilter = {
         }
     }
 }
+const rout = {
+    state: {
+        rout: {}
+    },
+
+    mutations: {
+        // 设置数据字典
+        ROUT: (state, rout) => {
+            state.rout = rout
+        }
+    },
+
+    actions: {
+        saveRout({ commit }, rout) {
+            commit('ROUT', rout)
+        }
+    },
+    getters: {
+        rout (state) {
+            return state.rout
+        }
+    }
+}
 const store = new Vuex.Store({
     modules: {
         dic,
-        dicFilter
+        dicFilter,
+        rout
     }
 })
 export default store
