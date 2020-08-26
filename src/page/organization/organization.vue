@@ -68,8 +68,42 @@
       </div>
     </el-dialog>
 
-      <el-dialog title="选择员工" :visible.sync="addStaffDialogVisiable" @close="addStaffClose" width="650px">
-
+      <el-dialog title="选择员工" :visible.sync="addStaffDialogVisiable" @close="addStaffClose" width="850px">
+          <div class="t-top-bar">
+              <el-input placeholder="员工编号、员工姓名" v-model="listQuery.keyword" class="input-with-select search-input">
+                  <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getAddStaffList">搜索</el-button>
+              </el-input>
+              <el-select class="search-option" v-model="listQuery.staffType"@change="getAddStaffList" placeholder="员工类型">
+                  <el-option label="全部" :value="-1"></el-option>
+                  <el-option v-for="(val,key) in selectDic('STAFF_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
+              </el-select>
+              <el-select class="search-option" v-model="listQuery.sex"@change="getAddStaffList" placeholder="员工性别">
+                  <el-option label="全部" :value="-1"></el-option>
+                  <el-option v-for="(val,key) in selectDic('SEX')" :key="key" :label="val.name" :value="val.code"></el-option>
+              </el-select>
+          </div>
+          <el-table :data="addStafftableData" border style="width: 100%" v-loading="listLoading"
+                    @selection-change="handleSelectionChange" max-height="500px">
+              <el-table-column  type="selection" width="55">
+              </el-table-column>
+              <el-table-column prop="staffId" label="员工编号"></el-table-column>
+              <el-table-column prop="staffName" label="员工姓名"></el-table-column>
+              <el-table-column prop="sex" label="性别" width="80">
+                  <template slot-scope="scope">
+                      {{scope.row.sex | dicFilter('SEX')}}
+                  </template>
+              </el-table-column>
+              <el-table-column prop="staffType" label="员工类型">
+                  <template slot-scope="scope">
+                      {{scope.row.staffType | dicFilter('STAFF_TYPE')}}
+                  </template>
+              </el-table-column>
+              <el-table-column prop="entryTime" label="入职时间">
+                  <template slot-scope="scope">
+                      {{scope.row.entryTime | formateTime()}}
+                  </template>
+              </el-table-column>
+          </el-table>
           <div slot="footer" class="dialog-footer">
               <el-button @click="addStaffDialogVisiable = false">取 消</el-button>
               <el-button type="primary" @click="addStaffConfirm">确 定</el-button>
@@ -80,11 +114,13 @@
 
 <script>
     import { addDepartment,updateDepartment,getDepartmentList } from '../../api/department'
+    import { getStaffPageList } from '../../api/staff'
     import localCache from "../../util/localCache";
 export default {
 name: "Organization",
   data() {
     return {
+        listLoading:false,
       addDialogVisiable: false,
         addStaffDialogVisiable:false,
         opFlag: 'add',
@@ -108,13 +144,24 @@ name: "Organization",
             ],
         },
         treeData: [],
+        addStafftableData:[],
         defaultTree: {
           children: 'children',
               label: 'name'
         },
       tableData: [],
         selectRow: '',
-        showFlag: 'his'
+        showFlag: 'his',
+        listQuery: {
+            page: 1,
+            size: 10,
+            keyword: '',
+            departmentId:'',
+            staffType:'',
+            sex:'',
+            status:''
+        },
+        addStaffSelect:[]
       }
   },
     mounted(){
@@ -238,6 +285,7 @@ name: "Organization",
       },
       staffHandler(){
           this.showFlag = 'staff'
+          this.getAddStaffList()
         this.addStaffDialogVisiable = true
       },
       removeHandler(row){
@@ -248,6 +296,24 @@ name: "Organization",
       },
       addStaffConfirm(){
 
+      },
+      getAddStaffList() {
+          this.listLoading = true
+          this.listQuery.customerId = localCache.getCurrentCustomerId()
+          getStaffPageList(this.listQuery).then(res => {
+              this.listLoading = false
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.addStafftableData = res.data.content
+              }
+          }).catch(() => {
+              this.listLoading = false
+          })
+      },
+      handleSelectionChange(val){
+        this.addStaffSelect = val
+          console.log(val)
       }
   }
 }
@@ -257,6 +323,9 @@ name: "Organization",
 @import "../../styles/common";
 .organization-container {
   height: calc(100vh - 205px);
+    .search-option{
+        width:120px;
+    }
 }
 .l-add-buttion{
 

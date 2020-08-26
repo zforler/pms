@@ -4,6 +4,22 @@
       <el-input placeholder="员工编号、员工姓名" v-model="listQuery.keyword" class="input-with-select search-input">
         <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getList">搜索</el-button>
       </el-input>
+        <el-cascader class="search-option" clearable
+                v-model="searchDepart" placeholder="所属班组"  :options="treeData"
+                :props="{ expandTrigger: 'hover', label: 'name',value:'departmentId' }"
+                @change="searchChange"></el-cascader>
+        <el-select class="search-option" v-model="listQuery.staffType"@change="searchChange" placeholder="员工类型">
+            <el-option label="全部" :value="-1"></el-option>
+            <el-option v-for="(val,key) in selectDic('STAFF_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
+        </el-select>
+        <el-select class="search-option" v-model="listQuery.sex"@change="searchChange" placeholder="员工性别">
+            <el-option label="全部" :value="-1"></el-option>
+            <el-option v-for="(val,key) in selectDic('SEX')" :key="key" :label="val.name" :value="val.code"></el-option>
+        </el-select>
+        <el-select class="search-option" v-model="listQuery.status"@change="searchChange" placeholder="员工状态">
+            <el-option label="全部" :value="-1"></el-option>
+            <el-option v-for="(val,key) in selectDic('STAFF_STATUS')" :key="key" :label="val.name" :value="val.code"></el-option>
+        </el-select>
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
@@ -14,14 +30,14 @@
               {{scope.row.sex | dicFilter('SEX')}}
           </template>
       </el-table-column>
-        <el-table-column prop="departmentName" label="所属班组" width="280">
+        <el-table-column prop="departmentName" label="所属班组">
             <template slot-scope="scope">
                 {{scope.row.departmentName || '--'}}
             </template>
         </el-table-column>
       <el-table-column prop="staffType" label="员工类型" width="100">
           <template slot-scope="scope">
-              {{scope.row.sex | dicFilter('STAFF_TYPE')}}
+              {{scope.row.staffType | dicFilter('STAFF_TYPE')}}
           </template>
       </el-table-column>
       <el-table-column prop="entryTime" label="入职时间" width="180">
@@ -39,7 +55,7 @@
                 {{scope.row.status | dicFilter('STAFF_STATUS')}}
             </template>
         </el-table-column>
-      <el-table-column prop="phone" label="联系方式" width="100"></el-table-column>
+      <el-table-column prop="phone" label="联系方式" width="120"></el-table-column>
       <el-table-column prop="address" label="员工住址" width="280"></el-table-column>
       <el-table-column prop="idcard" label="身份证号" width="150"></el-table-column>
       <el-table-column fixed="right" width="140" label="操作">
@@ -47,7 +63,6 @@
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
           <i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>
           <i class="el-icon-bank-card el-icon-table" @click="delHandler(scope.row)"></i>
-          <i class="el-icon-setting el-icon-table" @click="setOrgHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
@@ -55,8 +70,11 @@
     <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.size" @pagination="getList" />
 
 
-    <el-dialog title="添加员工" @close="addCloseHandler" :visible.sync="addDialogVisiable" width="650px">
+    <el-dialog  :title="opFlag=='add'?'添加员工信息':'修改员工信息'" @close="addCloseHandler" :visible.sync="addDialogVisiable" width="650px">
       <el-form :model="addForm" :rules="rules" ref="addForm">
+          <el-form-item label="员工编号" prop="staffId" :label-width="formLabelWidth">
+              <el-input :disabled="opFlag!='add'" v-model="addForm.staffId" autocomplete="off"></el-input>
+          </el-form-item>
         <el-form-item label="员工姓名" prop="staffName" :label-width="formLabelWidth">
           <el-input v-model="addForm.staffName" autocomplete="off"></el-input>
         </el-form-item>
@@ -70,7 +88,7 @@
                   <el-option v-for="(val,key) in selectDic('STAFF_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
               </el-select>
           </el-form-item>
-          <el-form-item label="员工类型" prop="departmentId" :label-width="formLabelWidth">
+          <el-form-item label="所属班组" prop="departmentId" :label-width="formLabelWidth">
               <el-cascader
                       v-model="addForm.departmentId"
                       :options="treeData"
@@ -102,7 +120,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button @click="addDialogVisiable = false">取 消</el-button>
         <el-button type="primary" @click="addConfirm">确 定</el-button>
       </div>
     </el-dialog>
@@ -115,13 +133,6 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="设置员工部门" :visible.sync="setOrgDialogVisiable" width="650px">
-      <el-tree :data="treeData" :props="defaultTree" @node-click="handleNodeClick"></el-tree>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="setOrgDialogVisiable = false">取 消</el-button>
-        <el-button type="primary" @click="setOrgDialogVisiable = false">确 定</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -138,13 +149,14 @@ name: "staff",
   data() {
     return {
       searchValue: '',
+        searchDepart:'',
       addDialogVisiable: false,
       confirmVisible: false,
-      setOrgDialogVisiable: false,
         opFlag: 'add',
       formLabelWidth: '80px',
       tableData: [],
       addForm: {
+          staffId:'',
           staffName: '',
           sex: '1',
           departmentId: '',
@@ -157,6 +169,9 @@ name: "staff",
           idcard: '',
       },
         rules: {
+            staffId: [
+                { min: 1, max: 32, message: '长度在 1 到 32 个字符', trigger: 'blur' }
+            ],
             staffName: [
                 { required: true, message: '员工姓名不能为空', trigger: 'blur' },
                 { min: 2, max: 8, message: '长度在 2 到 8 个字符', trigger: 'blur' }
@@ -177,7 +192,11 @@ name: "staff",
         listQuery: {
             page: 1,
             size: 10,
-            keyword: ''
+            keyword: '',
+            departmentId:'',
+            staffType:'',
+            sex:'',
+            status:''
         },
         total: 0,
         listLoading: true,
@@ -195,10 +214,25 @@ name: "staff",
         this.getTree()
     },
   methods: {
+      searchChange(){
+        this.getList()
+      },
     addHandler() {
       this.addDialogVisiable = true
     },
     editHandler(row) {
+        this.selectRow = row
+        this.opFlag='edit'
+        this.addForm = Object.assign({}, row)
+        if(row.parents){
+            let arr = row.parents.split(',')
+            arr.push(row.departmentId)
+            this.addForm.departmentId = arr
+        }
+        this.addForm.staffType += ''
+        this.addForm.sex += ''
+        this.addForm.entryTime = new Date(row.entryTime*1000)
+        this.addForm.leaveTime =row.leaveTime?new Date(row.leaveTime*1000):''
       this.addDialogVisiable = true
     },
     delHandler(row){
@@ -206,12 +240,6 @@ name: "staff",
     },
     confirmCloseHandler() {
 
-    },
-    handleNodeClick(data) {
-      console.log(data);
-    },
-    setOrgHandler(row) {
-      this.setOrgDialogVisiable = true
     },
       addCloseHandler(){
           this.$refs['addForm'].resetFields()
@@ -233,7 +261,6 @@ name: "staff",
               if (!valid) {
                   return
               }
-              console.log(this.addForm)
               let param = Object.assign({}, this.addForm)
               param.customerId = localCache.getCurrentCustomerId()
               param.entryTime = param.entryTime.getTime()/1000
@@ -242,7 +269,9 @@ name: "staff",
               }else{
                   param.leaveTime = 0
               }
-              param.departmentId = param.departmentId[param.departmentId.length-1]
+              if(param.departmentId){
+                  param.departmentId = param.departmentId[param.departmentId.length-1]
+              }
               if(this.opFlag=='add'){
                   addStaff(param).then((res)=>{
                       if(res.errorcode==0){
@@ -281,6 +310,11 @@ name: "staff",
       getList() {
           this.listLoading = true
           this.listQuery.customerId = localCache.getCurrentCustomerId()
+          if(this.searchDepart){
+              this.listQuery.departmentId = this.searchDepart[this.searchDepart.length-1]
+          }else{
+              this.listQuery.departmentId = ''
+          }
           getStaffPageList(this.listQuery).then(res => {
               this.listLoading = false
               if (res.errorcode !== 0) {
@@ -313,12 +347,15 @@ name: "staff",
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .t-top-bar{
   margin-bottom: 15px;
 }
 .search-input {
   width: 350px;
+}
+.search-option{
+    margin-left: 15px;
 }
 .l-add-buttion{
   font-size: 35px;
@@ -330,5 +367,8 @@ name: "staff",
 <style>
     .staff-container .el-dialog__body{
         padding: 30px 80px;
+    }
+    .staff-container .el-scrollbar__wrap {
+        overflow-x: hidden !important;
     }
 </style>
