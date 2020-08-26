@@ -100,8 +100,8 @@ export default {
   background: #fff;
   padding: 32px 16px;
   position: absolute;
-  right: 20px;
-  bottom: 10px;
+  right: 30px;
+  bottom: 40px;
   height: 80px;
 }
 .pagination-container.hidden {

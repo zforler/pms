@@ -44,6 +44,9 @@ let DateFormat = {
     },
 }
 export function formateTime(timestamp, reg='yyyy-MM-dd hh:mm:ss'){
+    if(!timestamp){
+        return '--'
+    }
     let tt = parseInt(timestamp)
     if(tt < 9999999999){
         tt *= 1000

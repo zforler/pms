@@ -39,7 +39,7 @@
           <el-input v-model="addForm.realName" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="性别" prop="sex" :label-width="formLabelWidth">
-            <el-select v-model="addForm.sex" placeholder="请选是否可见">
+            <el-select v-model="addForm.sex" placeholder="请选性别">
                 <el-option v-for="(val,key) in selectDic('SEX')" :key="key" :label="val.name" :value="val.code"></el-option>
             </el-select>
         </el-form-item>
