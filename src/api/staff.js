@@ -41,3 +41,11 @@ export function getStaffPageList(params) {
         params
     })
 }
+export function getNoDepartStaffList(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getNoDepartStaffList',
+        method: 'get',
+        params
+    })
+}

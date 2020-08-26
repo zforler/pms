@@ -91,7 +91,7 @@
           <el-form-item label="所属班组" prop="departmentId" :label-width="formLabelWidth">
               <el-cascader
                       v-model="addForm.departmentId"
-                      :options="treeData"
+                      :options="treeData" clearable
                       :props="{ expandTrigger: 'hover', label: 'name',value:'departmentId' }"
                       @change="handleChange"></el-cascader>
           </el-form-item>
