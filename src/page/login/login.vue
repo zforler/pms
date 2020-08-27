@@ -53,6 +53,7 @@ name: "login",
                   localCache.setToken(data.token)
                   localCache.setUser(data.user)
                   localCache.setRole(data.role)
+                  localCache.setCustomer(data.customer)
                   localCache.setCurrentCustomerId(data.user.customerId)
                   localCache.clearMenus()
                   this.$router.push({path: '/index'})

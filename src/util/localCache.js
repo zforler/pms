@@ -29,6 +29,12 @@ class LocalCache{
     getRole(){
         return  JSON.parse(this.cache.getItem('role'))
     }
+    setCustomer(customer={}){
+        this.cache.setItem('customer', JSON.stringify(customer))
+    }
+    getCustomer(){
+        return  JSON.parse(this.cache.getItem('customer'))
+    }
     setMenus(menus){
         this.cache.setItem('menus', JSON.stringify(menus))
     }

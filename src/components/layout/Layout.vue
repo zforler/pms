@@ -9,7 +9,7 @@
     <div class="l-right-container">
       <div class="l-right-top">
         <div class="l-right-top-company">
-            <el-select  :disabled="roleLevel>2" v-model="customerId" filterable @change="cumstomerChange">
+            <el-select v-if="userCustomerId=='0000'" v-model="customerId" filterable @change="cumstomerChange">
                 <el-option
                         v-for="item in companys"
                         :key="item.customerId"
@@ -17,6 +17,7 @@
                         :value="item.customerId">
                 </el-option>
             </el-select>
+          <h3 v-else>{{company}}</h3>
             <!--<h3 v-else @click="changeConpany">xxxgong公司</h3>-->
         </div>
         <div class="l-right-top-user-c">
@@ -51,7 +52,9 @@ name: "Layout",
     return {
       userOperation: false,
         companys: [],
-        customerId:''
+        customerId:'',
+        company: '',
+        userCustomerId:''
     }
   },
   components:{
@@ -126,7 +129,8 @@ name: "Layout",
     this.customerId = localCache.getCurrentCustomerId()
       this.$refs.menu.setActive(this.$router.currentRoute.path)
       this.getCustomerList_()
-
+    this.company = localCache.getCustomer().company
+      this.userCustomerId = localCache.getUser().customerId
   }
 }
 </script>
