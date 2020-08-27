@@ -129,7 +129,7 @@
       <span>确定删除此员工信息?</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="confirmVisible = false">取 消</el-button>
-        <el-button type="primary" @click="confirmVisible = false">确 定</el-button>
+        <el-button type="primary" @click="confirmHandler">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -138,7 +138,7 @@
 
 <script>
     import Pagination from '@/components/Pagination';
-    import { addStaff,updateStaff,getStaffPageList } from '../../api/staff'
+    import { addStaff,updateStaff,getStaffPageList,deleteStaff } from '../../api/staff'
     import { getDepartmentList } from '../../api/department'
     import localCache from "../../util/localCache";
 export default {
@@ -236,7 +236,8 @@ name: "staff",
       this.addDialogVisiable = true
     },
     delHandler(row){
-
+          this.selectRow = row
+        this.confirmVisible = true
     },
     confirmCloseHandler() {
 
@@ -343,6 +344,20 @@ name: "staff",
           }).catch(() => {
           })
       },
+      confirmHandler(){
+          deleteStaff({
+              staffId: this.selectRow.staffId,
+              customerId:localCache.getCurrentCustomerId()
+          }).then(res => {
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.getList()
+                  this.confirmVisible = false
+              }
+          }).catch(() => {
+          })
+      }
   }
 }
 </script>

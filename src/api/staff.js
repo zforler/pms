@@ -49,3 +49,27 @@ export function getNoDepartStaffList(params) {
         params
     })
 }
+export function configDeparts(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/configDeparts',
+        method: 'post',
+        params
+    })
+}
+export function unbindDepart(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/unbindDepart',
+        method: 'post',
+        params
+    })
+}
+export function getDepartStaffPageList(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getDepartStaffPageList',
+        method: 'get',
+        params
+    })
+}

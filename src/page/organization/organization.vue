@@ -6,19 +6,19 @@
       </div>
       <el-tree :data="treeData"  :props="defaultTree" :expand-on-click-node="false">
            <div class="depart-tree-node" slot-scope="{ node, data }">
-                <span @click="treeDetailHandler(node, data)">{{ node.label }}</span>
+                <span v-if="data.type==3" style="width: calc(100% - 100px)" @click="treeDetailHandler(node, data)">{{ node.label+"("+data.staffCount+")" }}</span>
+               <span v-else style="width: calc(100% - 100px)" @click="treeDetailHandler(node, data)">{{ node.label }}</span>
                 <span class="depart-tree-node-btn">
                    <i class="el-icon-edit el-icon-tree" @click="() => editHandler(node, data)"></i>
                     <i v-if="data.type==3" class="el-icon-user-solid el-icon-tree" @click="() => staffHandler(node, data)"></i>
                    <i v-else class="el-icon-share el-icon-tree" @click="() => addSub(data)"></i>
-
                 </span>
             </div>
       </el-tree>
     </div>
     <div class="org-his">
 
-        <div v-if="showFlag=='his'">
+        <div v-show="showFlag=='his'">
             <div class="org-his-title">
                 变更记录
             </div>
@@ -31,22 +31,28 @@
                 <el-table-column prop="name" label="部门名称"></el-table-column>
             </el-table>
         </div>
-        <div v-else-if="showFlag=='staff'">
+        <div v-show="showFlag=='staff'">
             <div class="org-his-title">
                 班组员工
             </div>
-            <el-table :data="tableData" border style="width: 100%">
-                <el-table-column prop="date" label="员工编号"></el-table-column>
-                <el-table-column prop="name" label="员工名称"></el-table-column>
-                <el-table-column prop="address" label="加入时间"></el-table-column>
-                <el-table-column label="操作" width="80">
+            <el-table :data="rightStaffTableData" border style="width: 100%">
+                <el-table-column prop="staffId" label="员工编号"></el-table-column>
+                <el-table-column prop="staffName" label="员工名称"></el-table-column>
+                <el-table-column prop="sex" label="性别" width="80">
+                    <template slot-scope="scope">
+                        {{scope.row.sex | dicFilter('SEX')}}
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="100">
                     <template slot-scope="scope">
                         <el-tooltip content="移除" placement="top">
-                            <i class="el-icon-delete el-icon-table" @click="removeHandler(scope.row)"></i>
+                            <i class="el-icon-delete el-icon-table" @click="rightStaffRemoveHandler(scope.row)"></i>
                         </el-tooltip>
                     </template>
                 </el-table-column>
             </el-table>
+            <pagination :total="rightStaffTotal" :page.sync="listQueryStaff.page" :limit.sync="listQueryStaff.size"
+                        @pagination="getDepartStaffPageList_" />
         </div>
     </div>
 
@@ -57,13 +63,13 @@
           <el-input v-model="addForm.name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="部门类型" prop="type" :label-width="formLabelWidth">
-            <el-select :disabled="selectRow.type==2 || opFlag=='edit'" v-model="addForm.type" placeholder="请选部门类型">
+            <el-select :disabled="selectTree.type==2 || opFlag=='edit'" v-model="addForm.type" placeholder="请选部门类型">
                 <el-option v-for="(val,key) in selectDic('DEPART_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
             </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button @click="addDialogVisiable = false">取 消</el-button>
         <el-button type="primary" @click="addConfirm">确 定</el-button>
       </div>
     </el-dialog>
@@ -109,12 +115,21 @@
               <el-button type="primary" @click="addStaffConfirm">确 定</el-button>
           </div>
       </el-dialog>
+
+      <el-dialog title="提示" :visible.sync="removeStaffConfirmVisible" width="30%">
+          <span>确定移除此员工?</span>
+          <span slot="footer" class="dialog-footer">
+        <el-button @click="removeStaffConfirmVisible = false">取 消</el-button>
+        <el-button type="primary" @click="removeStaffConfirmCloseHandler">确 定</el-button>
+      </span>
+      </el-dialog>
   </div>
 </template>
 
 <script>
+    import Pagination from '@/components/Pagination';
     import { addDepartment,updateDepartment,getDepartmentList } from '../../api/department'
-    import { getStaffPageList } from '../../api/staff'
+    import { getStaffPageList,getNoDepartStaffList,configDeparts,getDepartStaffPageList,unbindDepart } from '../../api/staff'
     import localCache from "../../util/localCache";
 export default {
 name: "Organization",
@@ -123,6 +138,7 @@ name: "Organization",
         listLoading:false,
       addDialogVisiable: false,
         addStaffDialogVisiable:false,
+        removeStaffConfirmVisible: false,
         opFlag: 'add',
         opFlagMap:{
             add:'添加部门',
@@ -151,6 +167,7 @@ name: "Organization",
         },
       tableData: [],
         selectRow: '',
+        selectTree: '',
         showFlag: 'his',
         listQuery: {
             page: 1,
@@ -161,9 +178,23 @@ name: "Organization",
             sex:'',
             status:''
         },
+        listQueryStaff: {
+            page: 1,
+            size: 10,
+            keyword: '',
+            departmentId:'',
+            staffType:'',
+            sex:'',
+            status:''
+        },
+        rightStaffTableData:[],
+        rightStaffTotal:0,
         addStaffSelect:[]
       }
   },
+    components: {
+        Pagination,
+    },
     mounted(){
         this.getTree()
     },
@@ -183,7 +214,7 @@ name: "Organization",
     },
     editHandler(node,data) {
         this.opFlag = 'edit'
-        this.selectRow = data
+        this.selectTree = data
         this.addForm.type = ''+data.type
       this.addDialogVisiable = true
     },
@@ -214,7 +245,7 @@ name: "Organization",
                   })
               }else if(this.opFlag == 'edit'){
                   updateDepartment({
-                      id: this.selectRow.id,
+                      id: this.selectTree.id,
                       name: this.addForm.name,
                   }).then((res)=>{
                       if(res.errorcode==0){
@@ -236,7 +267,7 @@ name: "Organization",
                       name: this.addForm.name,
                       type: this.addForm.type,
                       customerId:localCache.getCurrentCustomerId(),
-                      parentId: this.selectRow.departmentId
+                      parentId: this.selectTree.departmentId
                   }).then((res)=>{
                       if(res.errorcode==0){
                           this.$message({
@@ -268,44 +299,67 @@ name: "Organization",
           })
       },
       treeDetailHandler(node, data){
+        this.selectTree = data
         if(data.type == 3){
             this.showFlag = 'staff'
+            this.getDepartStaffPageList_()
+
         }else{
             this.showFlag = 'his'
         }
       },
+      //下级按钮
       addSub(data){
         this.opFlag = 'addsub'
-          this.selectRow = data
-          console.log(data.type)
+          this.selectTree = data
           if(data.type == 2){
             this.addForm.type = '3'
           }
           this.addDialogVisiable = true
       },
-      staffHandler(){
+      //员工按钮
+      staffHandler(node,data){
           this.showFlag = 'staff'
+          this.selectTree = data
           this.getAddStaffList()
+          this.getDepartStaffPageList_()
         this.addStaffDialogVisiable = true
       },
       removeHandler(row){
-        this.selectRow = row
+        this.selectTree = row
       },
       addStaffClose(){
-
+          this.addStaffSelect = []
       },
       addStaffConfirm(){
+          if(this.addStaffSelect.length == 0){
+              this.$message.error('请选择员工')
+              return
+          }
 
+          let staffIds = this.addStaffSelect.map(t=>t.staffId).join(',')
+          configDeparts({
+              staffIds: staffIds,
+              departmentId: this.selectTree.departmentId,
+              customerId: localCache.getCurrentCustomerId()
+          }).then(res => {
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.addStaffDialogVisiable = false
+              }
+          }).catch(() => {
+          })
       },
       getAddStaffList() {
           this.listLoading = true
           this.listQuery.customerId = localCache.getCurrentCustomerId()
-          getStaffPageList(this.listQuery).then(res => {
+          getNoDepartStaffList(this.listQuery).then(res => {
               this.listLoading = false
               if (res.errorcode !== 0) {
                   this.$message.error(res.message)
               } else {
-                  this.addStafftableData = res.data.content
+                  this.addStafftableData = res.data
               }
           }).catch(() => {
               this.listLoading = false
@@ -314,17 +368,53 @@ name: "Organization",
       handleSelectionChange(val){
         this.addStaffSelect = val
           console.log(val)
+      },
+      getDepartStaffPageList_(){
+          this.listLoading = true
+          this.listQueryStaff.departmentId = this.selectTree.departmentId
+          this.listQueryStaff.customerId = localCache.getCurrentCustomerId()
+          getDepartStaffPageList(this.listQueryStaff).then(res => {
+              this.listLoading = false
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.rightStaffTableData = res.data.content
+                  this.rightStaffTotal = res.data.total
+              }
+          }).catch(() => {
+              this.listLoading = false
+          })
+      },
+      rightStaffRemoveHandler(row){
+          this.selectRow = row
+          this.removeStaffConfirmVisible = true
+      },
+      removeStaffConfirmCloseHandler(){
+          unbindDepart({
+              staffId: this.selectRow.staffId
+          }).then(res => {
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.getDepartStaffPageList_()
+                  this.removeStaffConfirmVisible = false
+              }
+          }).catch(() => {
+          })
       }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "../../styles/common";
 .organization-container {
   height: calc(100vh - 205px);
     .search-option{
         width:120px;
+    }
+    .el-tree-node__content{
+        height: auto;
     }
 }
 .l-add-buttion{
