@@ -314,7 +314,6 @@ let _import = file => require('@/page/' + file + '.vue').default // vue-loader a
 
 
 router.beforeEach((to, from, next) => {
-    console.log(123111)
     if(to.name != '登录'){
         let token = localCache.getToken();
         console.log('token', token)

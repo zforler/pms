@@ -14,7 +14,10 @@ export default {
   },
     mounted(){
       console.log('app init')
-        this.getSysDicList_()
+        if(this.$router.currentRoute.name != '登录'){
+            this.getSysDicList_()
+        }
+
     },
     methods:{
         getSysDicList_(){

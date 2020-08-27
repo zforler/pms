@@ -3,7 +3,9 @@ class LocalCache{
         this.cache = window.localStorage
         this.sessionCache = window.sessionStorage
     }
-
+    clear(){
+        this.cache.clear()
+    }
     getToken(){
         let token = this.cache.getItem('x-token')
         return token
