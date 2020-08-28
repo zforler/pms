@@ -7,55 +7,57 @@
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="date" label="电卡编号" width="80"></el-table-column>
-      <el-table-column prop="name" label="电卡内码"></el-table-column>
-      <el-table-column prop="name" label="电卡名称" width="180"></el-table-column>
-      <el-table-column prop="name" label="电卡类型"></el-table-column>
-      <el-table-column prop="name" label="绑定信息"></el-table-column>
-      <el-table-column prop="name" label="添加时间"></el-table-column>
-      <el-table-column prop="name" label="修改时间"></el-table-column>
+      <el-table-column prop="cardId" label="电卡编号" width="80"></el-table-column>
+      <el-table-column prop="cardNo" label="电卡内码"></el-table-column>
+      <el-table-column prop="cardName" label="电卡名称" width="180"></el-table-column>
+      <el-table-column prop="cardType" label="电卡类型">
+          <template slot-scope="scope">
+              {{scope.row.cardType | dicFilter('CARD_TYPE')}}
+          </template>
+      </el-table-column>
+      <el-table-column prop="staffName" label="绑定员工"></el-table-column>
+      <el-table-column prop="status" label="状态"></el-table-column>
+      <el-table-column prop="createTime" label="添加时间">
+          <template slot-scope="scope">
+              {{scope.row.createTime | formateTime()}}
+          </template>
+      </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
-          <i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>
-          <i class="el-icon-setting el-icon-table" @click="setDataHandler(scope.row)"></i>
           <i v-if="scope.row.status==0" class="el-icon-unlock el-icon-table" @click="setLockHandler(scope.row)"></i>
           <i v-else class="el-icon-lock el-icon-table" @click="setLockHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
-    </el-pagination>
+      <!-- 分页组件 -->
+      <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.size" @pagination="getList" />
 
 
-    <el-dialog title="添加用户" :visible.sync="addDialogVisiable" width="650px">
-      <el-form :model="addForm">
-        <el-form-item label="电卡编号" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+    <el-dialog :title="opFlag=='add'?'添加电卡':'编辑电卡'" :visible.sync="addDialogVisiable" width="650px" @close="addCloseHandler">
+      <el-form :model="addForm":rules="rules" ref="addForm">
+        <el-form-item label="电卡内码" prop="cardNo" :label-width="formLabelWidth">
+          <el-input v-model="addForm.cardNo" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="电卡内码" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+        <el-form-item label="电卡名称" prop="cardName" :label-width="formLabelWidth">
+          <el-input v-model="addForm.cardName" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="电卡名称" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+        <el-form-item label="电卡类型" prop="cardType" :label-width="formLabelWidth">
+            <el-select v-model="addForm.cardType" placeholder="请选电卡类型">
+                <el-option v-for="(val,key) in selectDic('CARD_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
+            </el-select>
         </el-form-item>
-        <el-form-item label="电卡类型" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="绑定信息" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+        <el-form-item v-if="addForm.cardType==1" label="绑定员工" prop="staffId" :label-width="formLabelWidth">
+            <el-select v-model="addForm.staffId" filterable placeholder="请选择">
+                <el-option v-for="item in unbindCardStaff" :key="item.staffId"
+                        :label="item.staffName"  :value="item.staffId">
+                </el-option>
+            </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button @click="addDialogVisiable = false">取 消</el-button>
+        <el-button type="primary" @click="addConfirm">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -70,60 +72,71 @@
 </template>
 
 <script>
+    import Pagination from '@/components/Pagination';
+    import { getCardPageList,addCard,updateCard,getUnbindCardStaffList } from '../../api/card'
+    import localCache from "../../util/localCache";
 export default {
   name: "card",
+    components: {
+        Pagination
+    },
   data() {
     return {
       searchValue: '',
       addDialogVisiable: false,
+        opFlag: 'add',
       confirmVisible: false,
       formLabelWidth: '120px',
-      tableData: [{
-        date: '0001',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        status: 0,
-      }, {
-        date: '0002',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄',
-        status: 0,
-      }, {
-        date: '0002',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄',
-        status: 0,
-      }, {
-        date: '0004',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄',
-        status: 0,
-      }],
+      tableData: [],
       addForm: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+          cardId: '',
+          cardNo: '',
+          cardName: '',
+          cardType: '',
+          staffId: '',
       },
-      currentPage4: 4
+        rules: {
+            cardName: [
+                { required: true, message: '电卡名称不能为空', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+            ],
+            cardNo: [
+                { required: true, message: '电卡内码不能为空', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 64 个字符', trigger: 'blur' }
+            ],
+            cardType: [
+                { required: true, message: '请选择卡类型', trigger: 'change' },
+            ],
+        },
+        listQuery: {
+            page: 1,
+            size: 10,
+            keyword: '',
+            departmentId:'',
+            staffType:'',
+            sex:'',
+            status:''
+        },
+        total: 0,
+        listLoading: true,
+        unbindCardStaff:[]
     }
   },
+    mounted(){
+        this.getList()
+    },
   methods: {
     addHandler() {
+        this.opFlag = 'add'
       this.addDialogVisiable = true
+        this.getUnbindCardStaffList_()
     },
     editHandler(row) {
+        this.opFlag = 'edit'
+        this.addForm = Object.assign({}, row)
+        this.addForm.cardType += ''
       this.addDialogVisiable = true
-    },
-    delHandler(row){
-      this.confirmVisible = true
-    },
-    setDataHandler(row){
-
+        this.getUnbindCardStaffList_()
     },
     setLockHandler(row){
       row.status = row.status == 0?1:0
@@ -131,12 +144,86 @@ export default {
     confirmCloseHandler() {
 
     },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    }
+      addConfirm() {
+          this.$refs['addForm'].validate((valid) => {
+              if (!valid) {
+                  return
+              }
+              let param = Object.assign({}, this.addForm)
+              param.customerId = localCache.getCurrentCustomerId()
+              if(this.opFlag=='add'){
+                  addCard(param).then((res)=>{
+                      if(res.errorcode==0){
+                          this.$message({
+                              message: '添加成功',
+                              type: 'success'
+                          })
+                          this.addDialogVisiable = false
+                          this.getList()
+                      }else{
+                          this.$message({
+                              message: res.message,
+                              type: 'error'
+                          })
+                      }
+                  })
+              }else{
+                  updateCard(param).then((res)=>{
+                      if(res.errorcode==0){
+                          this.$message({
+                              message: '修改成功',
+                              type: 'success'
+                          })
+                          this.addDialogVisiable = false
+                          this.getList()
+                      }else{
+                          this.$message({
+                              message: res.message,
+                              type: 'error'
+                          })
+                      }
+                  })
+              }
+          });
+      },
+      getList() {
+          this.listLoading = true
+          this.listQuery.customerId = localCache.getCurrentCustomerId()
+         
+          getCardPageList(this.listQuery).then(res => {
+              this.listLoading = false
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.tableData = res.data.content
+                  this.total = res.data.total
+              }
+          }).catch(() => {
+              this.listLoading = false
+          })
+      },
+      addCloseHandler(){
+          this.$refs['addForm'].resetFields()
+          this.addForm =  {
+              cardId: '',
+              cardNo: '',
+              cardName: '',
+              cardType: '',
+              staffId: '',
+          }
+      },
+      getUnbindCardStaffList_(){
+          getUnbindCardStaffList({
+              customerId: localCache.getCurrentCustomerId()
+          }).then(res => {
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.unbindCardStaff = res.data
+              }
+          }).catch(() => {
+          })
+      }
   }
 }
 </script>
