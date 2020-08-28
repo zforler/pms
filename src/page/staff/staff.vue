@@ -61,7 +61,7 @@
       <el-table-column fixed="right" width="140" label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
-          <i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>
+          <!--<i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>-->
           <i class="el-icon-bank-card el-icon-table" @click="delHandler(scope.row)"></i>
         </template>
       </el-table-column>

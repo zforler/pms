@@ -4,7 +4,7 @@
       <div class="org-tree-btns">
         <i class="el-icon-circle-plus-outline l-operate-buttion" @click="addHandler"></i>
       </div>
-      <el-tree :data="treeData"  :props="defaultTree" :expand-on-click-node="false">
+      <el-tree   default-expand-all :data="treeData"  :props="defaultTree" :expand-on-click-node="false">
            <div class="depart-tree-node" slot-scope="{ node, data }">
                 <span v-if="data.type==3" style="width: calc(100% - 100px)" @click="treeDetailHandler(node, data)">{{ node.label+"("+data.staffCount+")" }}</span>
                <span v-else style="width: calc(100% - 100px)" @click="treeDetailHandler(node, data)">{{ node.label }}</span>

@@ -1,23 +1,31 @@
 <template>
   <div class="card-container">
     <div class="t-top-bar">
-      <el-input placeholder="请输入内容" v-model="searchValue" class="input-with-select search-input">
-        <el-button  slot="append"  type="primary" icon="el-icon-search">搜索</el-button>
+      <el-input placeholder="请输入内容" v-model="listQuery.keyword" class="input-with-select search-input">
+        <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getList">搜索</el-button>
       </el-input>
+        <el-select class="search-option" v-model="listQuery.cardType"@change="getList()" placeholder="卡类型">
+            <el-option label="全部" :value="-1"></el-option>
+            <el-option v-for="(val,key) in selectDic('CARD_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
+        </el-select>
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="cardId" label="电卡编号" width="80"></el-table-column>
+      <el-table-column prop="cardId" label="电卡编号" width="100"></el-table-column>
       <el-table-column prop="cardNo" label="电卡内码"></el-table-column>
-      <el-table-column prop="cardName" label="电卡名称" width="180"></el-table-column>
+      <!--<el-table-column prop="cardName" label="电卡名称"></el-table-column>-->
       <el-table-column prop="cardType" label="电卡类型">
           <template slot-scope="scope">
               {{scope.row.cardType | dicFilter('CARD_TYPE')}}
           </template>
       </el-table-column>
       <el-table-column prop="staffName" label="绑定员工"></el-table-column>
-      <el-table-column prop="status" label="状态"></el-table-column>
-      <el-table-column prop="createTime" label="添加时间">
+      <el-table-column prop="status" label="状态">
+          <template slot-scope="scope">
+              {{scope.row.status | dicFilter('CARD_STATUS')}}
+          </template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="添加时间" width="180">
           <template slot-scope="scope">
               {{scope.row.createTime | formateTime()}}
           </template>
@@ -25,8 +33,8 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
-          <i v-if="scope.row.status==0" class="el-icon-unlock el-icon-table" @click="setLockHandler(scope.row)"></i>
-          <i v-else class="el-icon-lock el-icon-table" @click="setLockHandler(scope.row)"></i>
+          <i v-if="scope.row.status==0" class="el-icon-unlock el-icon-table" @click="lockHandler(scope.row)"></i>
+          <i v-else class="el-icon-lock el-icon-table" @click="unlockHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
@@ -34,16 +42,16 @@
       <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.size" @pagination="getList" />
 
 
-    <el-dialog :title="opFlag=='add'?'添加电卡':'编辑电卡'" :visible.sync="addDialogVisiable" width="650px" @close="addCloseHandler">
+    <el-dialog :title="opFlag=='add'?'添加电卡':'编辑电卡'" :visible.sync="addDialogVisiable" width="550px" @close="addCloseHandler">
       <el-form :model="addForm":rules="rules" ref="addForm">
         <el-form-item label="电卡内码" prop="cardNo" :label-width="formLabelWidth">
           <el-input v-model="addForm.cardNo" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="电卡名称" prop="cardName" :label-width="formLabelWidth">
-          <el-input v-model="addForm.cardName" autocomplete="off"></el-input>
-        </el-form-item>
+        <!--<el-form-item label="电卡名称" prop="cardName" :label-width="formLabelWidth">-->
+          <!--<el-input v-model="addForm.cardName" autocomplete="off"></el-input>-->
+        <!--</el-form-item>-->
         <el-form-item label="电卡类型" prop="cardType" :label-width="formLabelWidth">
-            <el-select v-model="addForm.cardType" placeholder="请选电卡类型">
+            <el-select :disabled="opFlag=='edit'" v-model="addForm.cardType" placeholder="请选电卡类型">
                 <el-option v-for="(val,key) in selectDic('CARD_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
             </el-select>
         </el-form-item>
@@ -73,7 +81,7 @@
 
 <script>
     import Pagination from '@/components/Pagination';
-    import { getCardPageList,addCard,updateCard,getUnbindCardStaffList } from '../../api/card'
+    import { getCardPageList,addCard,updateCard,getUnbindCardStaffList,updateCardStatus } from '../../api/card'
     import localCache from "../../util/localCache";
 export default {
   name: "card",
@@ -82,7 +90,6 @@ export default {
     },
   data() {
     return {
-      searchValue: '',
       addDialogVisiable: false,
         opFlag: 'add',
       confirmVisible: false,
@@ -96,10 +103,10 @@ export default {
           staffId: '',
       },
         rules: {
-            cardName: [
-                { required: true, message: '电卡名称不能为空', trigger: 'blur' },
-                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
-            ],
+            // cardName: [
+            //     { required: true, message: '电卡名称不能为空', trigger: 'blur' },
+            //     { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+            // ],
             cardNo: [
                 { required: true, message: '电卡内码不能为空', trigger: 'blur' },
                 { min: 2, max: 15, message: '长度在 2 到 64 个字符', trigger: 'blur' }
@@ -119,7 +126,8 @@ export default {
         },
         total: 0,
         listLoading: true,
-        unbindCardStaff:[]
+        unbindCardStaff:[],
+        selectRow:''
     }
   },
     mounted(){
@@ -132,15 +140,21 @@ export default {
         this.getUnbindCardStaffList_()
     },
     editHandler(row) {
+        this.selectRow = row
         this.opFlag = 'edit'
         this.addForm = Object.assign({}, row)
         this.addForm.cardType += ''
       this.addDialogVisiable = true
         this.getUnbindCardStaffList_()
     },
-    setLockHandler(row){
-      row.status = row.status == 0?1:0
+    lockHandler(row){
+      this.selectRow = row
+        this.updateCardStatus_(2)
     },
+      unlockHandler(row){
+          this.selectRow = row
+          this.updateCardStatus_(0)
+      },
     confirmCloseHandler() {
 
     },
@@ -223,21 +237,42 @@ export default {
               }
           }).catch(() => {
           })
+      },
+      updateCardStatus_(status){
+          updateCardStatus({
+              cardId:this.selectRow.cardId,
+              status: status
+          }).then(res => {
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.$message.success(res.message)
+                  this.getList()
+              }
+          }).catch(() => {
+          })
       }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-.t-top-bar{
-  margin-bottom: 15px;
-}
-.search-input {
-  width: 350px;
-}
-.l-add-buttion{
-  font-size: 35px;
-  float: right;
-  cursor: pointer;
-}
+<style lang="scss">
+    .card-container{
+        .el-form {
+            padding-right: 50px;
+        }
+        .t-top-bar{
+            margin-bottom: 15px;
+        }
+        .search-input {
+            width: 350px;
+        }
+        .l-add-buttion{
+            font-size: 35px;
+            float: right;
+            cursor: pointer;
+        }
+    }
+
+
 </style>

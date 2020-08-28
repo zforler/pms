@@ -86,6 +86,5 @@ export function formateTime(timestamp, reg='yyyy-MM-dd hh:mm:ss'){
 }
 
 export function dicFilter(value,type) {
-    console.log(type+value,store.getters.dicFilter[type+value])
     return store.getters.dicFilter[type+value]
 }

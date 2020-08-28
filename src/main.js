@@ -395,7 +395,7 @@ function createMenus(menus=[],res = []){
             path: m.path,
             type: m.type,
             hidden: !m.hidden,
-            meta: {close:!m.close},
+            meta: {close:m.close},
             icon: m.icon,
             children: m.children?createMenus(m.children):undefined
         }

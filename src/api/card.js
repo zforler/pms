@@ -49,3 +49,11 @@ export function getUnbindCardStaffList(params={}) {
         params
     })
 }
+export function updateCardStatus(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/updateCardStatus',
+        method: 'post',
+        params
+    })
+}
