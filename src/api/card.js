@@ -57,3 +57,11 @@ export function updateCardStatus(params) {
         params
     })
 }
+export function getUnbindStaffCardList(params={}) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getUnbindStaffCardList',
+        method: 'get',
+        params
+    })
+}

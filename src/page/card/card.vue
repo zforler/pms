@@ -11,10 +11,10 @@
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="cardId" label="电卡编号" width="100"></el-table-column>
-      <el-table-column prop="cardNo" label="电卡内码"></el-table-column>
-      <!--<el-table-column prop="cardName" label="电卡名称"></el-table-column>-->
-      <el-table-column prop="cardType" label="电卡类型">
+      <el-table-column prop="cardId" label="IC卡编号" width="100"></el-table-column>
+      <el-table-column prop="cardNo" label="IC卡内码"></el-table-column>
+      <!--<el-table-column prop="cardName" label="IC卡名称"></el-table-column>-->
+      <el-table-column prop="cardType" label="IC卡类型">
           <template slot-scope="scope">
               {{scope.row.cardType | dicFilter('CARD_TYPE')}}
           </template>
@@ -42,16 +42,16 @@
       <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.size" @pagination="getList" />
 
 
-    <el-dialog :title="opFlag=='add'?'添加电卡':'编辑电卡'" :visible.sync="addDialogVisiable" width="550px" @close="addCloseHandler">
+    <el-dialog :title="opFlag=='add'?'添加IC卡':'编辑IC卡'" :visible.sync="addDialogVisiable" width="550px" @close="addCloseHandler">
       <el-form :model="addForm":rules="rules" ref="addForm">
-        <el-form-item label="电卡内码" prop="cardNo" :label-width="formLabelWidth">
+        <el-form-item label="IC卡内码" prop="cardNo" :label-width="formLabelWidth">
           <el-input v-model="addForm.cardNo" autocomplete="off"></el-input>
         </el-form-item>
-        <!--<el-form-item label="电卡名称" prop="cardName" :label-width="formLabelWidth">-->
+        <!--<el-form-item label="IC卡名称" prop="cardName" :label-width="formLabelWidth">-->
           <!--<el-input v-model="addForm.cardName" autocomplete="off"></el-input>-->
         <!--</el-form-item>-->
-        <el-form-item label="电卡类型" prop="cardType" :label-width="formLabelWidth">
-            <el-select :disabled="opFlag=='edit'" v-model="addForm.cardType" placeholder="请选电卡类型">
+        <el-form-item label="IC卡类型" prop="cardType" :label-width="formLabelWidth">
+            <el-select :disabled="opFlag=='edit'" v-model="addForm.cardType" placeholder="请选IC卡类型">
                 <el-option v-for="(val,key) in selectDic('CARD_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
             </el-select>
         </el-form-item>
@@ -70,7 +70,7 @@
     </el-dialog>
 
     <el-dialog title="提示" :visible.sync="confirmVisible" width="30%" :before-close="confirmCloseHandler">
-      <span>确定删除此电卡信息?</span>
+      <span>确定删除此IC卡信息?</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="confirmVisible = false">取 消</el-button>
         <el-button type="primary" @click="confirmVisible = false">确 定</el-button>
@@ -104,11 +104,11 @@ export default {
       },
         rules: {
             // cardName: [
-            //     { required: true, message: '电卡名称不能为空', trigger: 'blur' },
+            //     { required: true, message: 'IC卡名称不能为空', trigger: 'blur' },
             //     { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
             // ],
             cardNo: [
-                { required: true, message: '电卡内码不能为空', trigger: 'blur' },
+                { required: true, message: 'IC卡内码不能为空', trigger: 'blur' },
                 { min: 2, max: 15, message: '长度在 2 到 64 个字符', trigger: 'blur' }
             ],
             cardType: [

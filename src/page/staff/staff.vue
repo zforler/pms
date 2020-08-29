@@ -40,6 +40,7 @@
               {{scope.row.staffType | dicFilter('STAFF_TYPE')}}
           </template>
       </el-table-column>
+        <el-table-column prop="cardId" label="IC卡号" width="100"></el-table-column>
       <el-table-column prop="entryTime" label="入职时间" width="180">
           <template slot-scope="scope">
               {{scope.row.entryTime | formateTime()}}
@@ -62,7 +63,6 @@
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
           <!--<i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>-->
-          <i class="el-icon-bank-card el-icon-table" @click="delHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
@@ -86,6 +86,13 @@
           <el-form-item label="员工类型" prop="staffType" :label-width="formLabelWidth">
               <el-select v-model="addForm.staffType" placeholder="请选员工类型">
                   <el-option v-for="(val,key) in selectDic('STAFF_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
+              </el-select>
+          </el-form-item>
+          <el-form-item label="绑定IC卡" prop="staffId" :label-width="formLabelWidth">
+              <el-select v-model="addForm.cardId" filterable placeholder="请选择">
+                  <el-option v-for="item in unbindStaffCard" :key="item.cardId"
+                             :label="item.cardId"  :value="item.cardId">
+                  </el-option>
               </el-select>
           </el-form-item>
           <el-form-item label="所属班组" prop="departmentId" :label-width="formLabelWidth">
@@ -140,6 +147,7 @@
     import Pagination from '@/components/Pagination';
     import { addStaff,updateStaff,getStaffPageList,deleteStaff } from '../../api/staff'
     import { getDepartmentList } from '../../api/department'
+    import { getUnbindStaffCardList } from '../../api/card'
     import localCache from "../../util/localCache";
 export default {
 name: "staff",
@@ -167,6 +175,7 @@ name: "staff",
           phone: '',
           address: '',
           idcard: '',
+          cardId:'',
       },
         rules: {
             staffId: [
@@ -207,6 +216,7 @@ name: "staff",
             children: 'children',
             label: 'name'
         },
+        unbindStaffCard:[]
     }
   },
     mounted(){
@@ -219,6 +229,7 @@ name: "staff",
       },
     addHandler() {
       this.addDialogVisiable = true
+        this.getUnbindStaffCardList_()
     },
     editHandler(row) {
         this.selectRow = row
@@ -234,6 +245,7 @@ name: "staff",
         this.addForm.entryTime = new Date(row.entryTime*1000)
         this.addForm.leaveTime =row.leaveTime?new Date(row.leaveTime*1000):''
       this.addDialogVisiable = true
+        this.getUnbindStaffCardList_()
     },
     delHandler(row){
           this.selectRow = row
@@ -255,6 +267,7 @@ name: "staff",
               phone: '',
               address: '',
               idcard: '',
+              cardId:'',
           }
       },
       addConfirm() {
@@ -357,7 +370,19 @@ name: "staff",
               }
           }).catch(() => {
           })
-      }
+      },
+      getUnbindStaffCardList_(){
+          getUnbindStaffCardList({
+              customerId: localCache.getCurrentCustomerId()
+          }).then(res => {
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.unbindStaffCard = res.data
+              }
+          }).catch(() => {
+          })
+      },
   }
 }
 </script>
