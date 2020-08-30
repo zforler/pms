@@ -99,8 +99,8 @@ export default {
 .pagination-container {
   background: #fff;
   padding: 32px 16px;
-  position: absolute;
-  right: 30px;
+  /*position: absolute;*/
+  /*right: 30px;*/
   bottom: 40px;
   height: 80px;
 }

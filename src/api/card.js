@@ -65,3 +65,19 @@ export function getUnbindStaffCardList(params={}) {
         params
     })
 }
+export function getUnbindCardPageList(params={}) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getUnbindCardPageList',
+        method: 'get',
+        params
+    })
+}
+export function getBindCardList(params={}) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getBindCardList',
+        method: 'get',
+        params
+    })
+}

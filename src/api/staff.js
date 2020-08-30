@@ -73,3 +73,21 @@ export function getDepartStaffPageList(params) {
         params
     })
 }
+
+export function bindCards(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/bindCards',
+        method: 'post',
+        params
+    })
+}
+
+export function unbindCards(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/unbindCards',
+        method: 'post',
+        params
+    })
+}

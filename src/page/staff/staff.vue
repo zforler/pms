@@ -40,7 +40,6 @@
               {{scope.row.staffType | dicFilter('STAFF_TYPE')}}
           </template>
       </el-table-column>
-        <el-table-column prop="cardId" label="IC卡号" width="100"></el-table-column>
       <el-table-column prop="entryTime" label="入职时间" width="180">
           <template slot-scope="scope">
               {{scope.row.entryTime | formateTime()}}
@@ -62,7 +61,8 @@
       <el-table-column fixed="right" width="140" label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
-          <!--<i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>-->
+            <i class="el-icon-folder-add el-icon-table" @click="unBindCardHandler(scope.row)"></i>
+          <i class="el-icon-bank-card el-icon-table" @click="bindCardHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
@@ -70,7 +70,7 @@
     <pagination :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.size" @pagination="getList" />
 
 
-    <el-dialog  :title="opFlag=='add'?'添加员工信息':'修改员工信息'" @close="addCloseHandler" :visible.sync="addDialogVisiable" width="650px">
+    <el-dialog class="staff-add"  :title="opFlag=='add'?'添加员工信息':'修改员工信息'" @close="addCloseHandler" :visible.sync="addDialogVisiable" width="650px">
       <el-form :model="addForm" :rules="rules" ref="addForm">
           <el-form-item label="员工编号" prop="staffId" :label-width="formLabelWidth">
               <el-input :disabled="opFlag!='add'" v-model="addForm.staffId" autocomplete="off"></el-input>
@@ -86,13 +86,6 @@
           <el-form-item label="员工类型" prop="staffType" :label-width="formLabelWidth">
               <el-select v-model="addForm.staffType" placeholder="请选员工类型">
                   <el-option v-for="(val,key) in selectDic('STAFF_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
-              </el-select>
-          </el-form-item>
-          <el-form-item label="绑定IC卡" prop="staffId" :label-width="formLabelWidth">
-              <el-select v-model="addForm.cardId" filterable placeholder="请选择">
-                  <el-option v-for="item in unbindStaffCard" :key="item.cardId"
-                             :label="item.cardId"  :value="item.cardId">
-                  </el-option>
               </el-select>
           </el-form-item>
           <el-form-item label="所属班组" prop="departmentId" :label-width="formLabelWidth">
@@ -140,14 +133,54 @@
       </span>
     </el-dialog>
 
+
+      <el-dialog title="绑定电卡列表" @close="bindCardCloseHandler" :visible.sync="bindCardDialogVisiable" width="650px">
+          <el-table :data="bindCardData" border style="width: 100%">
+              <el-table-column prop="cardId" label="IC卡编号" width="100"></el-table-column>
+              <el-table-column prop="cardNo" label="IC卡内码"></el-table-column>
+              <el-table-column prop="beginTime" label="添加时间" width="180">
+              <template slot-scope="scope">
+                  {{scope.row.beginTime | formateTime()}}
+              </template>
+              </el-table-column>
+              <el-table-column label="操作" width="80">
+                  <template slot-scope="scope">
+                      <i class="el-icon-delete el-icon-table" @click="unbindCardHandler(scope.row)"></i>
+                  </template>
+              </el-table-column>
+          </el-table>
+          <div slot="footer" class="dialog-footer">
+              <el-button @click="bindCardDialogVisiable = false">取 消</el-button>
+              <el-button type="primary" @click="bindCardDialogVisiable = false">确 定</el-button>
+          </div>
+      </el-dialog>
+
+      <el-dialog title="未绑定电卡列表" @close="bindCardCloseHandler" :visible.sync="unBindCardDialogVisiable"
+                 width="650px">
+          <el-table :data="unBindCardData" border style="width: 100%"
+                    @selection-change="unbindCardSelect">
+              <el-table-column  type="selection" width="55">
+              </el-table-column>
+              <el-table-column prop="cardId" label="IC卡编号" width="100"></el-table-column>
+              <el-table-column prop="cardNo" label="IC卡内码"></el-table-column>
+          </el-table>
+          <!-- 分页组件 -->
+          <pagination :total="unBindCardTotal" :page.sync="unBindCardlistQuery.page"
+                      :limit.sync="unBindCardlistQuery.size" @pagination="getUnbindCardPageList_" />
+          <div slot="footer" class="dialog-footer">
+              <el-button @click="unBindCardDialogVisiable = false">取 消</el-button>
+              <el-button type="primary" @click="bindConfirm">确 定</el-button>
+          </div>
+      </el-dialog>
+
   </div>
 </template>
 
 <script>
     import Pagination from '@/components/Pagination';
-    import { addStaff,updateStaff,getStaffPageList,deleteStaff } from '../../api/staff'
+    import { addStaff,updateStaff,getStaffPageList,deleteStaff,bindCards,unbindCards } from '../../api/staff'
     import { getDepartmentList } from '../../api/department'
-    import { getUnbindStaffCardList } from '../../api/card'
+    import { getUnbindStaffCardList,getUnbindCardPageList,getBindCardList } from '../../api/card'
     import localCache from "../../util/localCache";
 export default {
 name: "staff",
@@ -159,10 +192,14 @@ name: "staff",
       searchValue: '',
         searchDepart:'',
       addDialogVisiable: false,
+        bindCardDialogVisiable: false,
+        unBindCardDialogVisiable:false,
       confirmVisible: false,
         opFlag: 'add',
       formLabelWidth: '80px',
       tableData: [],
+        bindCardData:[],
+        unBindCardData:[],
       addForm: {
           staffId:'',
           staffName: '',
@@ -211,12 +248,20 @@ name: "staff",
         listLoading: true,
       treeData: [],
         selectRow: '',
+        selectBindCardRow: '',
         selectTree: '',
         defaultTree: {
             children: 'children',
             label: 'name'
         },
-        unbindStaffCard:[]
+        unbindStaffCard:[],
+        unBindCardlistQuery: {
+            page: 1,
+            size: 10,
+            keyword: '',
+        },
+        unBindCardTotal: 0,
+        unbindCardSelectArr:[],
     }
   },
     mounted(){
@@ -383,6 +428,92 @@ name: "staff",
           }).catch(() => {
           })
       },
+
+      bindCardHandler(row){
+          this.selectRow = row
+          this.getBindCardList_()
+        this.bindCardDialogVisiable = true
+      },
+      bindCardCloseHandler(){
+
+      },
+      getBindCardList_(){
+          getBindCardList({
+              staffId: this.selectRow.staffId,
+              customerId: localCache.getCurrentCustomerId()
+          }).then(res => {
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.bindCardData = res.data
+              }
+          }).catch(() => {
+          })
+      },
+      unBindCardCloseHandler(){
+          this.unBindCardDialogVisiable = false
+          this.unbindCardSelectArr = []
+      },
+      unBindCardHandler(row){
+          this.selectRow = row
+          this.getUnbindCardPageList_()
+          this.unBindCardDialogVisiable = true
+      },
+      getUnbindCardPageList_(){
+          this.unBindCardlistQuery.staffId =  this.selectRow.staffId
+              this.unBindCardlistQuery.customerId =  localCache.getCurrentCustomerId()
+          this.unbindCardSelectArrCache = this.unbindCardSelectArr.slice()
+          getUnbindCardPageList(this.unBindCardlistQuery).then(res => {
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.unBindCardData = res.data.content
+                  this.unBindCardTotal = res.data.total
+              }
+          }).catch(() => {
+          })
+      },
+      bindConfirm(){
+          if(this.unbindCardSelect.length == 0){
+              this.$message.error('请选择IC卡')
+              return
+          }
+          let cardIds = this.unbindCardSelectArr.map(t=>t.cardId).join(',')
+        bindCards({
+            staffId: this.selectRow.staffId,
+            customerId: localCache.getCurrentCustomerId(),
+            cardIds: cardIds
+        }).then(res => {
+            if (res.errorcode !== 0) {
+                this.$message.error(res.message)
+            } else {
+                this.unBindCardDialogVisiable = false
+                this.$message.success(res.message)
+            }
+        }).catch(() => {
+        })
+      },
+      unbindCardSelect(val){
+          console.log(val)
+        this.unbindCardSelectArr = val
+      },
+      unbindCardHandler(row){
+          this.selectBindCardRow = row
+          unbindCards({
+              staffId: this.selectRow.staffId,
+              customerId: localCache.getCurrentCustomerId(),
+              cardIds: row.cardId
+          }).then(res => {
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.$message.success('解绑成功')
+                  this.getBindCardList_()
+              }
+          }).catch(() => {
+          })
+      }
+
   }
 }
 </script>
@@ -405,7 +536,7 @@ name: "staff",
 
 </style>
 <style>
-    .staff-container .el-dialog__body{
+    .staff-add .el-dialog__body{
         padding: 30px 80px;
     }
     .staff-container .el-scrollbar__wrap {
