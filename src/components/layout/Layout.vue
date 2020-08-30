@@ -64,7 +64,7 @@ name: "Layout",
   },
     computed:{
         userName(){
-            return localCache.getUser().userName
+            return localCache.getUser().realName
         },
         roleLevel(){
             return parseInt(localCache.getRole().level)
