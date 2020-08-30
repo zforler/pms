@@ -1,7 +1,7 @@
 <template>
   <div class="customer-container">
     <div class="t-top-bar">
-      <el-input placeholder="全内容检索" v-model="listQuery.keyword" class="input-with-select search-input">
+      <el-input placeholder="请输入内容" v-model="listQuery.keyword" class="input-with-select search-input">
         <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getList">搜索</el-button>
       </el-input>
       <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加客户')" @click="addHandler"></i>

@@ -20,7 +20,6 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
-          <i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>
           <i v-if="scope.row.status==0" class="el-icon-unlock el-icon-table" @click="setLockHandler(scope.row)"></i>
           <i v-else class="el-icon-lock el-icon-table" @click="setLockHandler(scope.row)"></i>
         </template>
@@ -193,9 +192,6 @@ name: "user",
         this.addForm.sex += ''
         this.getRoleList_()
       this.addDialogVisiable = true
-    },
-    delHandler(row){
-      this.confirmVisible = true
     },
       addCloseHandler(){
         this.$refs['addForm'].resetFields()

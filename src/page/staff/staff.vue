@@ -58,7 +58,7 @@
         </el-table-column>
       <el-table-column prop="phone" label="联系方式" width="120"></el-table-column>
       <el-table-column prop="address" label="员工住址" width="280"></el-table-column>
-      <el-table-column prop="idcard" label="身份证号" width="150"></el-table-column>
+      <!--<el-table-column prop="idcard" label="身份证号" width="150"></el-table-column>-->
       <el-table-column fixed="right" width="140" label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
@@ -122,9 +122,9 @@
         <el-form-item label="员工住址" prop="address" :label-width="formLabelWidth">
           <el-input v-model="addForm.address" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="身份证号" prop="idcard" :label-width="formLabelWidth">
-          <el-input v-model="addForm.idcard" autocomplete="off"></el-input>
-        </el-form-item>
+        <!--<el-form-item label="身份证号" prop="idcard" :label-width="formLabelWidth">-->
+          <!--<el-input v-model="addForm.idcard" autocomplete="off"></el-input>-->
+        <!--</el-form-item>-->
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="addDialogVisiable = false">取 消</el-button>
@@ -195,7 +195,7 @@ name: "staff",
                 { min: 2, max: 64, message: '长度在 3 到 64 个字符', trigger: 'blur' }
             ],
             idcard: [
-                { min: 18, max: 15, message: '长度 18 个字符', trigger: 'blur' }
+                { min: 15, max: 18, message: '长度15 到 18 个字符', trigger: 'blur' }
             ],
         },
         listQuery: {
