@@ -228,7 +228,7 @@ name: "user",
 
       getRoleList_(){
           getRoleList({
-              customerId:localCache.getUser().customerId
+              customerId:localCache.getCurrentCustomerId()
           }).then(res => {
               this.roleList = res.data
           }).catch(() => {

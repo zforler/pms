@@ -23,7 +23,7 @@
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
-      <el-table-column prop="staffId" label="员工编号" width="150"></el-table-column>
+      <el-table-column prop="staffNo" label="员工编号" width="150"></el-table-column>
       <el-table-column prop="staffName" label="员工姓名" width="150"></el-table-column>
       <el-table-column prop="sex" label="性别" width="80">
           <template slot-scope="scope">
@@ -72,8 +72,8 @@
 
     <el-dialog class="staff-add"  :title="opFlag=='add'?'添加员工信息':'修改员工信息'" @close="addCloseHandler" :visible.sync="addDialogVisiable" width="650px">
       <el-form :model="addForm" :rules="rules" ref="addForm">
-          <el-form-item label="员工编号" prop="staffId" :label-width="formLabelWidth">
-              <el-input :disabled="opFlag!='add'" v-model="addForm.staffId" autocomplete="off"></el-input>
+          <el-form-item label="员工编号" prop="staffNo" :label-width="formLabelWidth">
+              <el-input :disabled="opFlag!='add'" v-model="addForm.staffNo" autocomplete="off"></el-input>
           </el-form-item>
         <el-form-item label="员工姓名" prop="staffName" :label-width="formLabelWidth">
           <el-input v-model="addForm.staffName" autocomplete="off"></el-input>
@@ -201,7 +201,7 @@ name: "staff",
         bindCardData:[],
         unBindCardData:[],
       addForm: {
-          staffId:'',
+          staffNo:'',
           staffName: '',
           sex: '1',
           departmentId: '',
@@ -215,7 +215,7 @@ name: "staff",
           cardId:'',
       },
         rules: {
-            staffId: [
+            staffNo: [
                 { min: 1, max: 32, message: '长度在 1 到 32 个字符', trigger: 'blur' }
             ],
             staffName: [

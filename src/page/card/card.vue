@@ -144,7 +144,7 @@ export default {
         this.opFlag = 'edit'
         this.addForm = Object.assign({}, row)
         this.addForm.cardType += ''
-      this.addDialogVisiable = true
+
         this.getUnbindCardStaffList_()
     },
     lockHandler(row){
@@ -234,6 +234,11 @@ export default {
                   this.$message.error(res.message)
               } else {
                   this.unbindCardStaff = res.data
+                  this.unbindCardStaff.push({
+                      staffId: this.selectRow.staffId,
+                      staffName: this.selectRow.staffName
+                  })
+                  this.addDialogVisiable = true
               }
           }).catch(() => {
           })

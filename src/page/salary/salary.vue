@@ -13,7 +13,7 @@
       <el-table-column prop="name" label="员工类型"></el-table-column>
       <el-table-column prop="name" label="计件工资"></el-table-column>
       <el-table-column prop="name" label="计时工资"></el-table-column>
-      <el-table-column prop="name" label="计件工资"></el-table-column>
+      <el-table-column prop="name" label="计数工资"></el-table-column>
       <el-table-column prop="name" label="调整项"></el-table-column>
       <el-table-column prop="name" label="补贴项"></el-table-column>
       <el-table-column prop="name" label="合计工资"></el-table-column>

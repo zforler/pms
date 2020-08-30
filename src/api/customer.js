@@ -1,6 +1,6 @@
 import request from '@/util/request'
 import localCache from '../util/localCache';
-// 登陆
+
 export function addCustomer(params) {
     params.token = localCache.getToken()
     return request({
