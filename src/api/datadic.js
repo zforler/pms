@@ -25,7 +25,7 @@ export function deleteSysDic(params) {
         params
     })
 }
-export function getSysDicList(params={}) {
+export function  getSysDicList(params={}) {
     params.token = localCache.getToken()
     return request({
         url: '/getSysDicList',

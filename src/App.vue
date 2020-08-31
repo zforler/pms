@@ -12,23 +12,30 @@ export default {
   components: {
     // HelloWorld
   },
-    mounted(){
-      console.log('app init')
+   async mounted(){
+        console.log('app init')
         if(this.$router.currentRoute.name != '登录'){
-            this.getSysDicList_()
+            await this.getSysDicList_()
         }
-
     },
     methods:{
         getSysDicList_(){
-            getSysDicList({
-                keyword: this.searchValue
-            }).then((res)=>{
-                let [tree,tree2] = this.toTree(res.data)
-                this.$store.dispatch('saveDic',tree)
-                console.log(tree2)
-                this.$store.dispatch('saveDicFilter',tree2)
+            return new Promise((resolve,reject)=>{
+                getSysDicList({
+                    keyword: this.searchValue
+                }).then((res)=>{
+                    let [tree,tree2] = this.toTree(res.data)
+                    // this.$store.dispatch('saveDic',tree)
+                    this.$store.commit('SET_DIC',tree)
+                    // console.log(tree2)
+                    // this.$store.dispatch('saveDicFilter',tree2)
+                    this.$store.commit('SET_DIC_F',tree2)
+                    resolve()
+                }).catch((err)=>{
+                    reject(err)
+                })
             })
+
         },
         toTree(data){
             let temp = {}
