@@ -6,11 +6,7 @@
             </el-input>
             <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
         </div>
-        <el-table
-                :data="tableData"
-                style="width: 100%;margin-bottom: 20px;"
-                row-key="menuId"
-                border
+        <el-table :data="tableData" style="width: 100%;margin-bottom: 20px;"  row-key="menuId"  border
                 :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
             <el-table-column prop="name" label="菜单名称"></el-table-column>
             <el-table-column prop="menuId" label="菜单编号"></el-table-column>

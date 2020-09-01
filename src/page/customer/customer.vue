@@ -140,6 +140,7 @@ name: "customer",
                               type: 'success'
                           })
                           this.addDialogVisiable = false
+                          this.$store.dispatch('pushCustomers',res.data)
                           this.getList()
                       }else{
                           this.$message({

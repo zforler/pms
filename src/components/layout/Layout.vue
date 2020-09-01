@@ -24,6 +24,7 @@
           <div class="l-right-top-user" @click="userClick">{{userName}}</div>
           <ul :class="userOperation?'l-right-top-user-opetion' : 'l-right-top-user-opetion-show'">
             <li class="l-rtuo-item" @click="logout">退出</li>
+            <li class="l-rtuo-item" @click="addDialogVisiable=true">修改密码</li>
           </ul>
         </div>
       </div>
@@ -35,6 +36,27 @@
           </div>
         </div>
       </div>
+
+
+
+      <el-dialog title="修改密码" @close="addCloseHandler" :visible.sync="addDialogVisiable" width="650px">
+        <el-form :model="addForm":rules="rules" ref="addForm">
+          <el-form-item label="旧密码" prop="oldPass" :label-width="formLabelWidth">
+            <el-input type="password" v-model="addForm.oldPass" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="新密码" prop="newPass1"  :label-width="formLabelWidth">
+            <el-input type="password" v-model="addForm.newPass1" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码" prop="newPass2"  :label-width="formLabelWidth">
+            <el-input type="password" v-model="addForm.newPass2" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="addDialogVisiable = false">取 消</el-button>
+          <el-button type="primary" @click="addConfirm">确 定</el-button>
+        </div>
+      </el-dialog>
+
     </div>
   </div>
 </template>
@@ -46,15 +68,45 @@ import Menu from "@/components/Menu/Menu";
 import LTabs from "@/components/layout/LTabs";
 import TabVIews from "@/components/layout/TabVIews";
     import { getCustomerList } from '../../api/customer'
+    import { updatePass } from '../../api/user'
 export default {
 name: "Layout",
   data() {
+      let validatePass = (rule, value, callback) => {
+          if (value !== this.addForm.newPass1) {
+              callback(new Error('两次输入密码不一致!'));
+          } else {
+              callback();
+          }
+      };
     return {
       userOperation: false,
-        companys: [],
+        // companys: [],
         customerId:'',
         company: '',
-        userCustomerId:''
+        userCustomerId:'',
+        addDialogVisiable: false,
+        formLabelWidth: '120px',
+        addForm: {
+            oldPass:'',
+            newPass1:'',
+            newPass2:''
+        },
+        rules: {
+            oldPass: [
+                { required: true, message: '密码不能为空', trigger: 'blur' },
+                { min: 6, max: 16, message: '长度在 3 到 16 个字', trigger: 'blur' }
+            ],
+            newPass1: [
+                { required: true, message: '密码不能为空', trigger: 'blur' },
+                { min: 6, max: 16, message: '长度在 3 到 16 个字', trigger: 'blur' }
+            ],
+            newPass2: [
+                { required: true, message: '密码不能为空', trigger: 'change' },
+                { min: 6, max: 16, message: '长度在 3 到 16 个字符', trigger: 'blur' },
+                { validator: validatePass, trigger: 'blur' }
+            ],
+        },
     }
   },
   components:{
@@ -68,7 +120,15 @@ name: "Layout",
         },
         roleLevel(){
             return parseInt(localCache.getRole().level)
-        }
+        },
+        companys: {
+            get() {
+                return this.$store.getters.customers
+            },
+            set(val) {
+                this.$store.dispatch('addCustomers',val)
+            }
+        },
     },
   watch: {
     $route(to, from) {
@@ -122,7 +182,33 @@ name: "Layout",
                    this.companys = res.data
               }
           })
-      }
+      },
+      addCloseHandler(){
+          this.$refs['addForm'].resetFields()
+          this.addForm =  {
+              oldPass:'',
+              newPass1:'',
+              newPass2:''
+          }
+      },
+      addConfirm() {
+          this.$refs['addForm'].validate((valid) => {
+              if (!valid) {
+                  return
+              }
+              let param = Object.assign({},this.addForm)
+              param.customerId = localCache.getUser().customerId
+              param.userId = localCache.getUser().userId;
+              updatePass(param).then((res)=>{
+                  if(res.errorcode==0){
+                      this.$message.success('修改成功')
+                      this.addDialogVisiable = false
+                  }else{
+                      this.$message.error(res.message)
+                  }
+              })
+          });
+      },
   },
   mounted() {
     console.log('layout')
@@ -190,7 +276,7 @@ name: "Layout",
 }
 .l-right-top-user-opetion {
   position: absolute;
-  top: calc(100% + 27px);
+  top: calc(100% + 20px);
   background-color: #ccc;
   width: 110px;
   min-height: 85px;
@@ -207,6 +293,9 @@ name: "Layout",
   text-align: center;
   cursor: pointer;
   padding: 8px 0;
+}
+.l-rtuo-item:hover{
+    color: $theme-color;
 }
 /*用户信息*/
 </style>

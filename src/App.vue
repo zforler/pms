@@ -12,11 +12,18 @@ export default {
   components: {
     // HelloWorld
   },
+    watch: {
+        $route(to, from) {
+            if(from.name=='登录' || !from.name){
+                this.getSysDicList_()
+            }
+        }
+    },
    async mounted(){
         console.log('app init')
-        if(this.$router.currentRoute.name != '登录'){
-            await this.getSysDicList_()
-        }
+        // if(this.$router.currentRoute.name != '登录'){
+        //     await this.getSysDicList_()
+        // }
     },
     methods:{
         getSysDicList_(){

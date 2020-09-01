@@ -72,11 +72,42 @@ const rout = {
         }
     }
 }
+
+const customers = {
+    state: {
+        customers: []
+    },
+
+    mutations: {
+        // 设置数据字典
+        CUSTOMERS: (state, dic) => {
+            state.customers = dic
+        },
+        PUSH_CUSTOMERS: (state, dic) => {
+            state.customers.push(dic)
+        }
+    },
+
+    actions: {
+        addCustomers({ commit }, dic) {
+            commit('CUSTOMERS', dic)
+        },
+        pushCustomers({ commit }, dic) {
+            commit('PUSH_CUSTOMERS', dic)
+        }
+    },
+    getters: {
+        customers (state) {
+            return state.customers
+        }
+    }
+}
 const store = new Vuex.Store({
     modules: {
         dic,
         dicFilter,
-        rout
+        rout,
+        customers
     }
 })
 export default store

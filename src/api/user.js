@@ -34,3 +34,20 @@ export function getUserPageList(params) {
         params
     })
 }
+
+export function updatePass(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/updatePass',
+        method: 'post',
+        params
+    })
+}
+export function resetPass(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/resetPass',
+        method: 'post',
+        params
+    })
+}

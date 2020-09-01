@@ -11,8 +11,9 @@
       <el-table-column prop="name" label="班次名称"></el-table-column>
       <el-table-column prop="name" label="开始时间"></el-table-column>
       <el-table-column prop="name" label="结束时间"></el-table-column>
-      <el-table-column prop="name" label="添加时间"></el-table-column>
-      <el-table-column prop="name" label="修改时间"></el-table-column>
+      <el-table-column prop="name" label="延时时间"></el-table-column>
+      <el-table-column prop="name" label="生效时间"></el-table-column>
+      <el-table-column prop="name" label="失效时间"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>

@@ -56,7 +56,7 @@ name: "login",
                   localCache.setCustomer(data.customer)
                   localCache.setCurrentCustomerId(data.user.customerId)
                   localCache.clearMenus()
-                  this.$router.push({path: '/index'})
+                  this.$router.replace({path: '/index'})
               }else{
                   this.$message({
                       message: res.message,

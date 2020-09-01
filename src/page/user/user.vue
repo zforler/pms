@@ -22,6 +22,7 @@
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
           <i v-if="scope.row.status==0" class="el-icon-unlock el-icon-table" @click="setLockHandler(scope.row)"></i>
           <i v-else class="el-icon-lock el-icon-table" @click="setLockHandler(scope.row)"></i>
+          <i class="el-icon-refresh-left el-icon-table" @click="resetHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
@@ -64,12 +65,20 @@
         <el-button type="primary" @click="confirmVisible = false">确 定</el-button>
       </span>
     </el-dialog>
+
+      <el-dialog title="提示" :visible.sync="resetConfirmVisible" width="30%">
+          <span>确定重置此用户密码?</span>
+          <span slot="footer" class="dialog-footer">
+        <el-button @click="resetConfirmVisible = false">取 消</el-button>
+        <el-button type="primary" @click="resetConfirm">确 定</el-button>
+      </span>
+      </el-dialog>
   </div>
 </template>
 
 <script>
     import Pagination from '@/components/Pagination';
-    import { addUser,updateUser,getUserPageList } from '../../api/user'
+    import { addUser,updateUser,getUserPageList,resetPass } from '../../api/user'
     import { getRoleList } from '../../api/role'
     import localCache from "../../util/localCache";
 export default {
@@ -81,6 +90,7 @@ name: "user",
     return {
       addDialogVisiable: false,
       confirmVisible: false,
+        resetConfirmVisible:false,
       formLabelWidth: '120px',
       tableData: [],
         opFlag:'add',
@@ -232,6 +242,22 @@ name: "user",
           }).then(res => {
               this.roleList = res.data
           }).catch(() => {
+          })
+      },
+      resetHandler(row){
+        this.selectRow = row;
+        this.resetConfirmVisible = true
+      },
+      resetConfirm(){
+          resetPass({
+              userId: this.selectRow.userId,
+              customerId:localCache.getCurrentCustomerId()
+          }).then(res => {
+              this.$message.success('重置成功！')
+              this.resetConfirmVisible = false
+          }).catch(() => {
+              this.$message.error(res.message)
+              this.resetConfirmVisible = false
           })
       }
   }
