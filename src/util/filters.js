@@ -84,7 +84,18 @@ export function formateTime(timestamp, reg='yyyy-MM-dd hh:mm:ss'){
     str = str.replace(/n|N/, milliSecond)
     return str
 }
-
+export function formateHourTime(timestamp){
+    let h = parseInt(timestamp/3600)
+    console.log(timestamp,h)
+    let t = timestamp - h*3600
+    console.log(t)
+    let m = parseInt(t/60)
+    let s = t%60
+    h = h<10?'0'+h:h;
+    m = m<10?'0'+m:m;
+    s = s<10?'0'+s:s
+    return `${h}:${m}:${s}`
+}
 export function dicFilter(value,type) {
     console.log(store.getters.dicFilter[type+value])
     return store.getters.dicFilter[type+value]

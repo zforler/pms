@@ -7,7 +7,7 @@ import Layout from "@/components/layout/Layout";
 import login from "@/page/login/login";
 import Company from "@/components/Company/Company";
 import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree,Tooltip,Radio,RadioGroup,
-    Message,Autocomplete,Loading,DatePicker,Cascader} from "element-ui";
+    Message,Autocomplete,Loading,DatePicker,Cascader,TimePicker} from "element-ui";
 import './icons';
 import localCache from "./util/localCache";
 import { findUserMenus } from '@/api/menu'
@@ -43,6 +43,7 @@ Vue.prototype.$message = Message;
 Vue.use(Autocomplete)
 Vue.use(Loading)
 Vue.use(DatePicker)
+Vue.use(TimePicker)
 Vue.use(Cascader)
 
 const temp = {
