@@ -232,6 +232,7 @@ name: "Layout",
     width: $menu-width;
     float: left;
     height: $h-100vh;
+    position: fixed;
   }
   .l-left-logo{
     height: 55px;
@@ -239,7 +240,7 @@ name: "Layout",
   .l-right-container{
     background-color: $bg-color;
     width: calc(100% - 250px);
-    float: left;
+    float: right;
     min-height: $h-100vh;
   }
   .l-right-top{
@@ -251,7 +252,8 @@ name: "Layout",
     align-items: center;
     border-bottom: #f0f0f0 thin solid;
     box-shadow: #ccc 5px 1px 10px;
-
+    width: calc(100vw - 250px);
+      position: fixed;
   }
 
   .l-right-bcontainer{
@@ -259,6 +261,7 @@ name: "Layout",
   }
   .l-right-content {
     padding: $p-25;
+      margin-top:55px;
   }
 .l-right-content-inner {
   border: #f0f0f0 thin solid;

@@ -6,8 +6,8 @@
       </el-input>
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
-    <el-table :data="tableData" border style="width: 100%" @row-click="rowClick">
-      <el-table-column prop="date" label="设备编号"></el-table-column>
+    <el-table :data="tableData" border style="width: 100%">
+      <el-table-column prop="date" label="设备编号1"></el-table-column>
       <el-table-column prop="address" label="设备名称"></el-table-column>
       <el-table-column prop="name" label="所属企业"></el-table-column>
       <el-table-column prop="name" label="设备类型"></el-table-column>
@@ -57,7 +57,7 @@
 
 <script>
 export default {
-  name: "equipment",
+  name: "equipmentDetail",
   data() {
     return {
       searchValue: '',
@@ -92,8 +92,54 @@ export default {
         resource: '',
         desc: ''
       },
+      currentPage4: 4,
+      treeData: [{
+        label: '一级 1',
+        children: [{
+          label: '二级 1-1',
+          children: [{
+            label: '三级 1-1-1'
+          }]
+        }]
+      }, {
+        label: '一级 2',
+        children: [{
+          label: '二级 2-1',
+          children: [{
+            label: '三级 2-1-1'
+          }]
+        }, {
+          label: '二级 2-2',
+          children: [{
+            label: '三级 2-2-1'
+          }]
+        }]
+      }, {
+        label: '一级 3',
+        children: [{
+          label: '二级 3-1',
+          children: [{
+            label: '三级 3-1-1'
+          }]
+        }, {
+          label: '二级 3-2',
+          children: [{
+            label: '三级 3-2-1'
+          }]
+        }]
+      }],
+      defaultTree: {
+        children: 'children',
+        label: 'label'
+      }
     }
   },
+    created () {
+        console.log(this.$route.params)
+    },
+    mounted(){
+
+    },
   methods: {
     addHandler() {
       this.addDialogVisiable = true
@@ -107,9 +153,12 @@ export default {
     confirmCloseHandler() {
 
     },
-      rowClick(row,column,event){
-        this.$router.push({name:'设备详情',params: {equipId: row.date }})
-      }
+    handleNodeClick(data) {
+      console.log(data);
+    },
+    setOrgHandler(row) {
+      this.setOrgDialogVisiable = true
+    }
   }
 }
 </script>
