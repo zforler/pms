@@ -1,50 +1,50 @@
 import request from '@/util/request'
 import localCache from '../util/localCache';
 // 登陆
-export function addProduction(params) {
+export function addPrice(params) {
     params.token = localCache.getToken()
     return request({
-        url: '/production',
+        url: '/price',
         method: 'post',
         params
     })
 }
-export function updateProduction(params) {
+export function updatePrice(params) {
     params.token = localCache.getToken()
     return request({
-        url: '/updateProduction',
+        url: '/updatePrice',
         method: 'post',
         params
     })
 }
-export function deleteProduction(params) {
+export function deletePrice(params) {
     params.token = localCache.getToken()
     return request({
-        url: '/deleteProduction',
+        url: '/deletePrice',
         method: 'post',
         params
     })
 }
-export function getProductionList(params={}) {
+export function getPriceList(params={}) {
     params.token = localCache.getToken()
     return request({
-        url: '/getProductionList',
+        url: '/getPriceList',
         method: 'get',
         params
     })
 }
-export function getProductionPageList(params) {
+export function getPricePageList(params) {
     params.token = localCache.getToken()
     return request({
-        url: '/getProductionPageList',
+        url: '/getPricePageList',
         method: 'get',
         params
     })
 }
-export function getProductionVoList(params) {
+export function getHisPriceList(params) {
     params.token = localCache.getToken()
     return request({
-        url: '/getProductionVoList',
+        url: '/getHisPriceList',
         method: 'get',
         params
     })

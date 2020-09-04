@@ -27,7 +27,7 @@
       <el-table-column label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
-            <i class="el-icon-edit el-icon-table" @click="hisHandler(scope.row)"></i>
+            <i class="el-icon-notebook-1 el-icon-table" @click="hisHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
@@ -176,6 +176,7 @@ export default {
         delayFlag: false
     }
   },
+
     mounted(){
         this.getList()
     },
@@ -185,7 +186,8 @@ export default {
           this.addForm =  {
               shiftName:'',
               beginTime:'',
-              endTime:''
+              endTime:'',
+              delayTime:''
           }
           this.delayFlag = false
           this.opFlag='add'
@@ -207,6 +209,7 @@ export default {
       },
       addConfirm() {
           this.$refs['addForm'].validate((valid) => {
+              console.log(valid)
               if (!valid) {
                   return
               }
@@ -225,33 +228,21 @@ export default {
               if(this.opFlag=='add'){
                   addShift(param).then((res)=>{
                       if(res.errorcode==0){
-                          this.$message({
-                              message: '添加成功',
-                              type: 'success'
-                          })
+                          this.$message.success('添加成功')
                           this.addDialogVisiable = false
                           this.getList()
                       }else{
-                          this.$message({
-                              message: res.message,
-                              type: 'error'
-                          })
+                          this.$message.success(res.message)
                       }
                   })
               }else{
                   updateShift(param).then((res)=>{
                       if(res.errorcode==0){
-                          this.$message({
-                              message: '修改成功',
-                              type: 'success'
-                          })
+                          this.$message.success('修改成功')
                           this.addDialogVisiable = false
                           this.getList()
                       }else{
-                          this.$message({
-                              message: res.message,
-                              type: 'error'
-                          })
+                          this.$message.success(res.message)
                       }
                   })
               }
