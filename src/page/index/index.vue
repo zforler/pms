@@ -60,6 +60,9 @@
     }
     .index-content{
         margin-top: 15px;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
     }
     .index-chart {
         width: calc(50% - 10px);

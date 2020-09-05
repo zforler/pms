@@ -72,6 +72,12 @@ class LocalCache{
     getCurrentCustomerId(){
        return this.cache.getItem('CurrentCustomerId')
     }
+    setCurrentEquipmentId(equipmentId){
+        this.cache.setItem('equipmentId',equipmentId)
+    }
+    getCurrentEquipmentId(){
+        return this.cache.getItem('equipmentId')
+    }
 }
 let localCache = new LocalCache();
 export default localCache
