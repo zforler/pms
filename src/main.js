@@ -312,21 +312,19 @@ const router = new VueRouter({
     // },
     ]
 })
-// let _import = file => () => import('./page/' + file + '.vue')
+let _import2 = file => () => import('./page/' + file + '.vue')
 let _import = file => require('@/page/' + file + '.vue').default // vue-loader at least v13.0.0+
 
-
+Vue.prototype._import = _import
 router.beforeEach((to, from, next) => {
     if(to.name != '登录'){
         let token = localCache.getToken();
         console.log('token', token)
         if(!token){
-            console.log(12311111)
             next({ path: '/login' })
             return false
         }
         if(to.path == '/'){
-            console.log(123111111)
             next({ path: '/index' })
             return false
         }
@@ -347,6 +345,9 @@ router.beforeEach((to, from, next) => {
                     localCache.setMenus(arr)
                     localCache.setMenusArr(res.data)
                     router.addRoutes(arr)
+                    if(to.path.endsWith('Report') && !from.name){
+                        addReport(router,to.path)
+                    }
                     router.options.routes=arr
                     next({
                         ...to,
@@ -371,17 +372,26 @@ router.beforeEach((to, from, next) => {
                 createMenus(menuArr, arr)
                 localCache.setMenus(arr)
                 router.addRoutes(arr)
+                if(to.path.endsWith('Report') && !from.name){
+                    addReport(router,to.path)
+                }
                 router.options.routes=arr
                 next({
                     ...to,
                     replace:true
                 })
-                console.log(123333)
             }
-
+            //
+            // let reportFlag = window.reportFlag
+            // if(to.path.endsWith('Report') && !from.name && !reportFlag){
+            //     window.reportFlag = true
+            //     getReport(to.path)
+            // }
         }
+
+    }else{
+
     }
-    console.log(1344)
     next()
 })
 
@@ -416,7 +426,22 @@ function createMenus(menus=[],res = []){
     }
     return child
 }
-
+function addReport(router, path){
+    let row = localCache.getReport(path)
+    let rout = [{
+        name: row.path,
+        path: '/',
+        component: Layout,
+        children: [
+            {
+                name: row.reportName,
+                path: row.path,
+                component:_import(row.filePath)
+            }
+        ]
+    }]
+    router.addRoutes(rout)
+}
 Vue.prototype.authedCheck = function (button) {
     let menuStr = localCache.getMenusStr()
     let reg = new RegExp(button)

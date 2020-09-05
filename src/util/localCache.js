@@ -78,6 +78,12 @@ class LocalCache{
     getCurrentEquipmentId(){
         return this.cache.getItem('equipmentId')
     }
+    setReport(path,report){
+        this.cache.setItem(path,JSON.stringify(report))
+    }
+    getReport(path){
+        return JSON.parse(this.cache.getItem(path))
+    }
 }
 let localCache = new LocalCache();
 export default localCache

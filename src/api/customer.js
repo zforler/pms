@@ -41,3 +41,20 @@ export function getCustomerPageList(params) {
         params
     })
 }
+
+export function getNoReportCustomerList(params={}) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getNoReportCustomerList',
+        method: 'get',
+        params
+    })
+}
+export function getHasReportCustomerList(params={}) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getHasReportCustomerList',
+        method: 'get',
+        params
+    })
+}

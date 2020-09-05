@@ -22,7 +22,8 @@
     </el-table>
 
 
-    <el-dialog :title="opFlag=='add'?'添加产品':'修改产品'" :visible.sync="addDialogVisiable" @close="addCloseHandler"  width="650px">
+    <el-dialog :title="opFlag=='add'?'添加产品':'修改产品'" :visible.sync="addDialogVisiable"
+               @close="addCloseHandler"  width="650px">
       <el-form :model="addForm" :rules="rules" ref="addForm">
         <el-form-item label="产品名称" prop="productionName" :label-width="formLabelWidth">
           <el-input v-model="addForm.productionName" autocomplete="off"></el-input>
@@ -99,17 +100,11 @@
               if(this.opFlag=='add'){
                   addProduction(param).then((res)=>{
                       if(res.errorcode==0){
-                          this.$message({
-                              message: '添加成功',
-                              type: 'success'
-                          })
+                          this.$message.success('添加成功')
                           this.addDialogVisiable = false
                           this.getList()
                       }else{
-                          this.$message({
-                              message: res.message,
-                              type: 'error'
-                          })
+                          this.$message.error(res.message)
                       }
                   })
               }else{

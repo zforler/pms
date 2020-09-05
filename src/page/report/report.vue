@@ -1,65 +1,60 @@
 <template>
   <div class="report-container">
     <div class="t-top-bar">
-      <el-input placeholder="请输入内容" v-model="searchValue" class="input-with-select search-input">
-        <el-button  slot="append"  type="primary" icon="el-icon-search">搜索</el-button>
+      <el-input placeholder="请输入内容" v-model="listQuery.keyword" class="input-with-select search-input">
+        <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getList">搜索</el-button>
       </el-input>
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
-    <el-table :data="tableData" border style="width: 100%">
-      <el-table-column prop="date" label="报表编号"></el-table-column>
-      <el-table-column prop="name" label="报表名称"></el-table-column>
-      <el-table-column prop="name" label="报表访问路径" ></el-table-column>
-      <el-table-column prop="address" label="报表文件路径"></el-table-column>
-      <el-table-column prop="name" label="添加时间"></el-table-column>
-      <el-table-column prop="name" label="修改时间"></el-table-column>
+    <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
+      <el-table-column prop="reportName" label="报表名称"></el-table-column>
+      <el-table-column prop="path" label="报表访问路径" ></el-table-column>
+      <el-table-column prop="filePath" label="报表文件路径"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
-          <i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>
-          <i class="el-icon-setting el-icon-table" @click="setRoleHandler(scope.row)"></i>
-          <i v-if="scope.row.status==0" class="el-icon-unlock el-icon-table" @click="setLockHandler(scope.row)"></i>
-          <i v-else class="el-icon-lock el-icon-table" @click="setLockHandler(scope.row)"></i>
+          <i class="el-icon-share el-icon-table" @click="shareHandler(scope.row)"></i>
+          <i class="el-icon-notebook-1 el-icon-table" @click="hisRoleHandler(scope.row)"></i>
+            <i class="el-icon-s-grid el-icon-table" @click="detailHandler(scope.row)"></i>
+
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage4"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
-    </el-pagination>
 
 
-    <el-dialog title="添加报表" :visible.sync="addDialogVisiable" width="650px">
-      <el-form :model="addForm">
-        <el-form-item label="用户编号" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+    <el-dialog :title="opFlag=='add'?'添加报表':'修改报表'" :visible.sync="addDialogVisiable"
+               @close="addCloseHandler" width="650px">
+      <el-form :model="addForm" :rules="rules" ref="addForm">
+        <el-form-item label="报表名称" prop="reportName" :label-width="formLabelWidth">
+          <el-input v-model="addForm.reportName" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="用户名" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+        <el-form-item label="报表访问路径" prop="path" :label-width="formLabelWidth">
+          <el-input v-model="addForm.path" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="用户姓名" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="性别" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="联系方式" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="用户角色" :label-width="formLabelWidth">
-          <el-input v-model="addForm.name" autocomplete="off"></el-input>
+        <el-form-item label="报表文件路径" prop="filePath" :label-width="formLabelWidth">
+          <el-input v-model="addForm.filePath" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button @click="addDialogVisiable = false">取 消</el-button>
+        <el-button type="primary" @click="addConfirm">确 定</el-button>
       </div>
     </el-dialog>
+
+      <el-dialog title="分配报表" :visible.sync="shareDialogVisiable"
+                 @close="shareCloseHandler" width="650px">
+          <el-table :data="customerTableData" border style="width: 100%"
+                    @selection-change="shareCustomerChange" v-loading="listLoading">
+              <el-table-column type="selection"  width="55">
+              </el-table-column>
+              <el-table-column prop="customerId" label="客户编号" width="80"></el-table-column>
+              <el-table-column prop="company" label="公司名称"></el-table-column>
+          </el-table>
+          <div slot="footer" class="dialog-footer">
+              <el-button @click="shareDialogVisiable = false">取 消</el-button>
+              <el-button type="primary" @click="shareConfirm">确 定</el-button>
+          </div>
+      </el-dialog>
 
     <el-dialog title="提示" :visible.sync="confirmVisible" width="30%" :before-close="confirmCloseHandler">
       <span>确定删除此用户信息?</span>
@@ -72,73 +67,223 @@
 </template>
 
 <script>
+    import { addReport,updateReport,getReportList,shareReport,cancleShareReport } from '../../api/report'
+    import { getNoReportCustomerList,getHasReportCustomerList } from '../../api/customer'
+    import localCache from "../../util/localCache";
+    import Layout from "@/components/layout/Layout"
 export default {
   name: "report",
   data() {
     return {
-      searchValue: '',
       addDialogVisiable: false,
+        shareDialogVisiable: false,
+        opFlag: 'add',
       confirmVisible: false,
       formLabelWidth: '120px',
-      tableData: [{
-        date: '0001',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄',
-        status: 0,
-      }, {
-        date: '0002',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄',
-        status: 0,
-      }, {
-        date: '0002',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄',
-        status: 0,
-      }, {
-        date: '0004',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄',
-        status: 0,
-      }],
+      tableData: [],
+        customerTableData:[],
       addForm: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+          reportName:'',
+          path:'',
+          filePath:'',
       },
-      currentPage4: 4
+        rules: {
+            reportName: [
+                { required: true, message: '报表名不能为空', trigger: 'blur' },
+                { min: 2, max: 64, message: '长度在 2 到 64 个字符', trigger: 'blur' }
+            ],
+            path: [
+                { required: true, message: '路径不能为空', trigger: 'blur' },
+                { min: 2, max: 64, message: '长度在 2 到 64 个字符', trigger: 'blur' }
+            ],
+            filePath: [
+                { required: true, message: '文件路径不能为空', trigger: 'blur' },
+                { min: 2, max: 64, message: '长度在 2 到 64 个字符', trigger: 'blur' }
+            ],
+        },
+        listQuery: {
+            keyword: ''
+        },
+        listLoading: true,
+        selectRow: '',
+        shareCustomerSelect:[]
     }
   },
+    mounted(){
+        this.getList()
+    },
   methods: {
-    addHandler() {
-      this.addDialogVisiable = true
-    },
-    editHandler(row) {
-      this.addDialogVisiable = true
-    },
-    delHandler(row){
-      this.confirmVisible = true
-    },
-    setRoleHandler(row){
+      confirmCloseHandler(){
 
-    },
-    setLockHandler(row){
-      row.status = row.status == 0?1:0
-    },
-    confirmCloseHandler() {
+      },
+      addCloseHandler(){
+          this.$refs['addForm'].resetFields()
+          this.addForm =  {
+              reportName:'',
+              path:'',
+              filePath:'',
+          }
+      },
+      addHandler() {
+          this.opFlag='add'
+          this.addDialogVisiable = true
+      },
+      editHandler(row) {
+          this.selectRow = row
+          this.opFlag='edit'
+          this.addForm = Object.assign({}, row)
+          this.addDialogVisiable = true
+      },
+      addConfirm() {
+          this.$refs['addForm'].validate((valid) => {
+              if (!valid) {
+                  return
+              }
+              let param = Object.assign({}, this.addForm)
+              if(this.opFlag == 'add'){
 
-    },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    }
+              }else if(this.opFlag == 'edit'){
+                  param.reportId = this.selectRow.reportId
+              }
+              param.customerId = localCache.getCurrentCustomerId()
+              if(this.opFlag=='add'){
+                  addReport(param).then((res)=>{
+                      if(res.errorcode==0){
+                          this.$message.success('添加成功')
+                          this.addDialogVisiable = false
+                          this.getList()
+                      }else{
+                          this.$message.error(res.message)
+                      }
+                  })
+              }else{
+                  updateReport(param).then((res)=>{
+                      if(res.errorcode==0){
+                          this.$message.success('修改成功')
+                          this.addDialogVisiable = false
+                          this.getList()
+                      }else{
+                          this.$message.error(res.message)
+                      }
+                  })
+              }
+          });
+      },
+      getList() {
+          this.listLoading = true
+          this.listQuery.customerId = localCache.getCurrentCustomerId()
+          getReportList(this.listQuery).then(res => {
+              this.listLoading = false
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.tableData = res.data
+              }
+          }).catch(() => {
+              this.listLoading = false
+          })
+      },
+      getNoReportCustomerList_(){
+          getNoReportCustomerList({
+              reportId: this.selectRow.reportId
+          }).then(res => {
+              this.listLoading = false
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.customerTableData = res.data
+              }
+          }).catch(() => {
+              this.listLoading = false
+          })
+      },
+      shareHandler(row){
+          this.opFlag = 'share'
+          this.selectRow = row
+          this.shareDialogVisiable = true
+          this.getNoReportCustomerList_()
+      },
+      shareCloseHandler(){
+          this.opFlag = 'add'
+          this.shareCustomerSelect = []
+      },
+      shareConfirm(){
+          if(this.shareCustomerSelect.length == 0){
+              this.$message.error('请选择客户')
+              return
+          }
+          if(this.opFlag == 'share'){
+              shareReport({
+                  customerIds: this.shareCustomerSelect.map(t=>t.customerId).join(','),
+                  reportId: this.selectRow.reportId
+              }).then(res => {
+                  this.listLoading = false
+                  if (res.errorcode !== 0) {
+                      this.$message.error(res.message)
+                  } else {
+                      this.$message.success('分配成功')
+                      this.shareDialogVisiable = false
+                  }
+              }).catch(() => {
+                  this.listLoading = false
+              })
+          }else if(this.opFlag == 'cancle'){
+              cancleShareReport({
+                  customerIds: this.shareCustomerSelect.map(t=>t.customerId).join(','),
+                  reportId: this.selectRow.reportId
+              }).then(res => {
+                  this.listLoading = false
+                  if (res.errorcode !== 0) {
+                      this.$message.error(res.message)
+                  } else {
+                      this.$message.success('取消分配成功')
+                      this.shareDialogVisiable = false
+                  }
+              }).catch(() => {
+                  this.listLoading = false
+              })
+          }
+
+      },
+      shareCustomerChange(val){
+          console.log(val)
+          this.shareCustomerSelect = val
+      },
+      hisRoleHandler(row){
+          this.opFlag = 'cancle'
+          this.selectRow = row
+          this.shareDialogVisiable = true
+          getHasReportCustomerList({
+              reportId: this.selectRow.reportId
+          }).then(res => {
+              this.listLoading = false
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.customerTableData = res.data
+              }
+          }).catch(() => {
+              this.listLoading = false
+          })
+      },
+      detailHandler(row){
+          let reportName = row.reportName
+          let rout = [{
+              name: row.path,
+              path: '/',
+              component: Layout,
+              children: [
+                  {
+                      name: reportName,
+                      path: row.path,
+                      component:  this.$root._import(row.filePath)
+                  }
+              ]
+          }]
+            localCache.setReport(row.path, row)
+         this.$router.addRoutes(rout)
+          this.$router.push({name: reportName,params: { reportId: row.reportId }})
+      }
   }
 }
 </script>
