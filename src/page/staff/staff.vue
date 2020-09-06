@@ -21,6 +21,13 @@
             <el-option v-for="(val,key) in selectDic('STAFF_STATUS')" :key="key" :label="val.name" :value="val.code"></el-option>
         </el-select>
       <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
+        <el-upload
+                class="upload-demo" :data="uploadParam"
+                :action="uploadUrl" :show-file-list="false"
+                :multiple="false" :on-success="uploadHandler" :on-progress="uploadProgressHandler"
+        >
+            <i class=" el-icon-upload2 l-add-buttion"></i>
+        </el-upload>
     </div>
     <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
       <el-table-column prop="staffNo" label="员工编号" width="150"></el-table-column>
@@ -262,9 +269,16 @@ name: "staff",
         },
         unBindCardTotal: 0,
         unbindCardSelectArr:[],
+        uploadUrl: process.env.VUE_APP_BASE_API+'/fileupload',
+        uploadParam:{
+          type: 1,
+        },
+        uploadLoading: ''
     }
   },
     mounted(){
+        this.uploadParam.customerId = localCache.getCurrentCustomerId()
+        this.uploadParam.token = localCache.getToken()
         this.getList()
         this.getTree()
     },
@@ -512,7 +526,25 @@ name: "staff",
               }
           }).catch(() => {
           })
+      },
+      uploadHandler(res, file, fileList){
+          if (res.errorcode !== 0) {
+              this.$message.error(res.message)
+          } else {
+              this.$message.success('导入成功')
+              this.getList()
+          }
+          this.uploadLoading.close()
+      },
+      uploadProgressHandler(event, file, fileList){
+          this.uploadLoading = this.$loading({
+              lock: true,
+              text: '导入中...',
+              spinner: 'el-icon-loading',
+              background: 'rgba(0, 0, 0, 0.7)'
+          });
       }
+
 
   }
 }
@@ -541,5 +573,9 @@ name: "staff",
     }
     .staff-container .el-scrollbar__wrap {
         overflow-x: hidden !important;
+    }
+    .upload-demo {
+        display: inline-block;
+        float: right;
     }
 </style>

@@ -67,7 +67,7 @@ export default {
           let str = '';
           let space = '&nbsp;'.repeat(level * 4)
           let pspace = '&nbsp;'.repeat((level - 1) * 4)
-          if (typeof jsonData === 'string') {
+          if (typeof jsonData === 'string' || typeof jsonData === 'number') {
               str += jsonData ? space + `"${jsonData}"` + ',' : ''
           } else if (Array.isArray(jsonData)) {
               //
