@@ -28,7 +28,8 @@ service.interceptors.request.use(config => {
     // 以表单的形式提交数据
     let header = config.headers['Content-Type']
     if (!header) {
-        config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
+        // config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
+        config.headers['Content-Type'] = 'application/json;charset=UTF-8'
         if (config.method === 'post') {
             // { indices: false }确保数组提交成功
             config.data = qs.stringify(config.data, { indices: false })

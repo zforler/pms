@@ -233,6 +233,7 @@ name: "Layout",
     float: left;
     height: $h-100vh;
     position: fixed;
+      z-index: 99;
   }
   .l-left-logo{
     height: 55px;
@@ -254,6 +255,7 @@ name: "Layout",
     box-shadow: #ccc 5px 1px 10px;
     width: calc(100vw - 250px);
       position: fixed;
+    z-index: 99;
   }
 
   .l-right-bcontainer{
