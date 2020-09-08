@@ -8,7 +8,16 @@
             <el-option label="全部" :value="-1"></el-option>
             <el-option v-for="(val,key) in selectDic('CARD_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
         </el-select>
-      <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
+        <a class="el-icon-download l-down-buttion" title="导入模板下载" href="/cardImport.xlsx"
+           download="IC卡导入模板"></a>
+        <el-upload
+                class="upload-demo" :data="uploadParam"
+                :action="uploadUrl" :show-file-list="false"
+                :multiple="false" :on-success="uploadHandler" :on-progress="uploadProgressHandler">
+            <i class=" el-icon-upload2 l-add-buttion"></i>
+        </el-upload>
+
+        <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column prop="cardId" label="IC卡编号" width="100"></el-table-column>
@@ -127,10 +136,18 @@ export default {
         total: 0,
         listLoading: true,
         unbindCardStaff:[],
-        selectRow:''
+        selectRow:'',
+        uploadUrl: process.env.VUE_APP_BASE_API+'/fileupload',
+        uploadParam:{
+            type: 2,
+        },
+        uploadLoading: ''
+
     }
   },
     mounted(){
+        this.uploadParam.customerId = localCache.getCurrentCustomerId()
+        this.uploadParam.token = localCache.getToken()
         this.getList()
     },
   methods: {
@@ -256,6 +273,23 @@ export default {
               }
           }).catch(() => {
           })
+      },
+      uploadHandler(res, file, fileList){
+          if (res.errorcode !== 0) {
+              this.$message.error(res.message)
+          } else {
+              this.$message.success('导入成功')
+              this.getList()
+          }
+          this.uploadLoading.close()
+      },
+      uploadProgressHandler(event, file, fileList){
+          this.uploadLoading = this.$loading({
+              lock: true,
+              text: '导入中...',
+              spinner: 'el-icon-loading',
+              background: 'rgba(0, 0, 0, 0.7)'
+          });
       }
   }
 }
@@ -276,6 +310,16 @@ export default {
             font-size: 35px;
             float: right;
             cursor: pointer;
+        }
+        .upload-demo {
+            display: inline-block;
+            float: right;
+        }
+        .l-down-buttion{
+            font-size: 25px;
+            float: right;
+            cursor: pointer;
+            margin-top: 8px;
         }
     }
 

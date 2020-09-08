@@ -20,14 +20,16 @@
             <el-option label="全部" :value="-1"></el-option>
             <el-option v-for="(val,key) in selectDic('STAFF_STATUS')" :key="key" :label="val.name" :value="val.code"></el-option>
         </el-select>
-      <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
+
+        <a class="el-icon-download l-down-buttion" title="导入模板下载" href="/staffImport.xlsx"
+           download="员工导入模板"></a>
         <el-upload
                 class="upload-demo" :data="uploadParam"
                 :action="uploadUrl" :show-file-list="false"
-                :multiple="false" :on-success="uploadHandler" :on-progress="uploadProgressHandler"
-        >
+                :multiple="false" :on-success="uploadHandler" :on-progress="uploadProgressHandler">
             <i class=" el-icon-upload2 l-add-buttion"></i>
         </el-upload>
+        <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
       <el-table-column prop="staffNo" label="员工编号" width="150"></el-table-column>
@@ -544,8 +546,6 @@ name: "staff",
               background: 'rgba(0, 0, 0, 0.7)'
           });
       }
-
-
   }
 }
 </script>
@@ -565,7 +565,12 @@ name: "staff",
   float: right;
   cursor: pointer;
 }
-
+.l-down-buttion{
+    font-size: 25px;
+    float: right;
+    cursor: pointer;
+    margin-top: 8px;
+}
 </style>
 <style>
     .staff-add .el-dialog__body{
@@ -578,4 +583,5 @@ name: "staff",
         display: inline-block;
         float: right;
     }
+
 </style>

@@ -13,6 +13,11 @@
               {{createPriceName(scope.row)}}
           </template>
       </el-table-column>
+        <el-table-column prop="priceType" label="计价类型">
+            <template slot-scope="scope">
+                {{scope.row.priceType | dicFilter('PRICE_TYPE')}}
+            </template>
+        </el-table-column>
       <el-table-column prop="staffType" label="员工类型">
           <template slot-scope="scope">
               {{scope.row.staffType | dicFilter('STAFF_TYPE')}}
@@ -38,6 +43,11 @@
         <el-form-item label="规则名称" :label-width="formLabelWidth">
           <el-input disabled="disabled" v-model="priceName" autocomplete="off"></el-input>
         </el-form-item>
+          <el-form-item label="计价类型" prop="priceType":label-width="formLabelWidth">
+              <el-select :disabled="opFlag=='edit'" v-model="addForm.priceType" placeholder="请选计价类型">
+                  <el-option v-for="(val,key) in selectDic('PRICE_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
+              </el-select>
+          </el-form-item>
         <el-form-item label="产品" prop="productionId" :label-width="formLabelWidth">
             <el-select :disabled="opFlag=='edit'" v-model="addForm.productionId" placeholder="请选产品">
                 <el-option v-for="(val,key) in products" :key="key" :label="val.productionName"
@@ -76,12 +86,17 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="历史记录" :visible.sync="hisDialogVisiable" width="1050px">
+    <el-dialog title="历史记录" :visible.sync="hisDialogVisiable" width="1150px">
         <el-table :data="hisTableData" border style="width: 100%" v-loading="hisListLoading">
             <el-table-column prop="priceId" label="规则编号" width="100"></el-table-column>
-            <el-table-column prop="priceName" label="规则名称">
+            <el-table-column prop="priceName" label="规则名称" width="280">
                 <template slot-scope="scope">
                     {{createPriceName(scope.row)}}
+                </template>
+            </el-table-column>
+            <el-table-column prop="priceType" label="计价类型">
+                <template slot-scope="scope">
+                    {{scope.row.priceType | dicFilter('PRICE_TYPE')}}
                 </template>
             </el-table-column>
             <el-table-column prop="staffType" label="员工类型">
@@ -95,12 +110,12 @@
                     {{scope.row.price / 100}}
                 </template>
             </el-table-column>
-            <el-table-column prop="activeTime" label="生效时间">
+            <el-table-column prop="activeTime" label="生效时间" width="180">
                 <template slot-scope="scope">
                     {{scope.row.activeTime | formateTime}}
                 </template>
             </el-table-column>
-            <el-table-column prop="reactiveTime" label="失效时间">
+            <el-table-column prop="reactiveTime" label="失效时间" width="180">
                 <template slot-scope="scope">
                     {{scope.row.reactiveTime | formateTime}}
                 </template>
@@ -147,6 +162,7 @@
                 tableData: [],
                 hisTableData:[],
                 addForm: {
+                    priceType:'',
                     staffType:'',
                     shiftId:'',
                     productionId:'',
@@ -155,6 +171,9 @@
                     price:0
                 },
                 rules: {
+                    priceType: [
+                        { required: true, message: '请选择计价类型', trigger: 'blur' },
+                    ],
                     productionId: [
                         { required: true, message: '请选择产品', trigger: 'blur' },
                     ],

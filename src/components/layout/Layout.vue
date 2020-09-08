@@ -63,7 +63,6 @@
 
 <script>
     import localCache from '@/util/localCache';
-import LMenu from "@/util/LMenu/LMenu";
 import Menu from "@/components/Menu/Menu";
 import LTabs from "@/components/layout/LTabs";
 import TabVIews from "@/components/layout/TabVIews";
@@ -223,7 +222,6 @@ name: "Layout",
 
 <style lang="scss" scoped>
 @import "../../styles/common";
-@import "../../util/LMenu/LMenu.css";
 
   .l-left-container{
     background-color: $theme-color;
