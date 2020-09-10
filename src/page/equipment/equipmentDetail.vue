@@ -27,12 +27,28 @@
                   <div class="t-top-bar">
                       <i class="el-icon-circle-plus-outline l-add-buttion" @click="subAddHandler"></i>
                   </div>
-                  <el-table :data="subTableData" border style="width: 100%" v-loading="listLoading">
+                  <el-table :data="subTableData" border style="width: 100%"@cell-click="switchClick" v-loading="listLoading">
                       <el-table-column prop="subEquipmentId" label="终端编号"></el-table-column>
                       <el-table-column prop="subEquipmentName" label="终端名称"></el-table-column>
                       <el-table-column prop="type" label="终端类型">
                           <template slot-scope="scope">
                           {{scope.row.type | dicFilter('EQUIP_TYPE')}}
+                          </template>
+                      </el-table-column>
+                      <el-table-column prop="staffTypeCalc" label="员工类型计价" width="180px">
+                          <template slot-scope="scope">
+                              <!--{{scope.row.staffTypeCalc | dicFilter('ACTIVE_FLAG')}}-->
+                              <el-switch v-model="scope.row.staffTypeCalc" @change="staffTypeCalcChange"
+                                      :active-value="1" :inactive-value="0" active-text="生效" inactive-text="关闭">
+                              </el-switch>
+                          </template>
+                      </el-table-column>
+                      <el-table-column  prop="shiftCalc" label="班次计价" width="180px">
+                          <template slot-scope="scope">
+                              <!--{{scope.row.shiftCalc | dicFilter('ACTIVE_FLAG')}}-->
+                              <el-switch v-model="scope.row.shiftCalc" @change="shiftCalc"
+                                      :active-value="1" :inactive-value="0" active-text="生效" inactive-text="关闭">
+                              </el-switch>
                           </template>
                       </el-table-column>
                       <el-table-column prop="name" label="添加时间" width="180px">
@@ -43,6 +59,7 @@
                       <el-table-column label="操作">
                           <template slot-scope="scope">
                               <i class="el-icon-edit el-icon-table" @click="subEditHandler(scope.row)"></i>
+                              <i class="el-icon-tickets el-icon-table" @click="switchHis(scope.row)"></i>
                           </template>
                       </el-table-column>
                   </el-table>
@@ -72,8 +89,6 @@
           </el-tabs>
       </div>
 
-
-
       <el-dialog :title="opFlag=='add'?'添加终端':'修改终端'" :visible.sync="addDialogVisiable"
                  @close="addCloseHandler" width="650px">
           <el-form :model="addForm" :rules="rules" ref="addForm">
@@ -91,26 +106,73 @@
               <el-button type="primary" @click="addSubConfirm">确 定</el-button>
           </div>
       </el-dialog>
+
+      <el-dialog title="提示" :visible.sync="confirmVisible" @close="confirmCloseHandler" width="30%">
+          <span>{{switchObj.msg}}</span>
+          <span slot="footer" class="dialog-footer">
+        <el-button @click="confirmVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirmHandler">确 定</el-button>
+      </span>
+      </el-dialog>
+
+      <el-dialog custom-class="calc-his-dialog" title="计价修改记录" :visible.sync="hisDialogVisiable" :lock-scroll="true">
+          <div class="calc-his-title">员工类型计费</div>
+          <el-table :data="hisTableData1" border style="width: 100%" v-loading="listLoading">
+              <el-table-column prop="activeTime" label="生效时间">
+                  <template slot-scope="scope">
+                      {{scope.row.beginTime | formateTime}}
+                  </template>
+              </el-table-column>
+              <el-table-column prop="reactiveTime" label="失效时间">
+                  <template slot-scope="scope">
+                      {{scope.row.endTime | formateTime}}
+                  </template>
+              </el-table-column>
+          </el-table>
+          <div class="calc-his-title">班次类型计费</div>
+          <el-table :data="hisTableData2" border style="width: 100%;" v-loading="listLoading">
+              <el-table-column prop="activeTime" label="生效时间">
+                  <template slot-scope="scope">
+                      {{scope.row.beginTime | formateTime}}
+                  </template>
+              </el-table-column>
+              <el-table-column prop="reactiveTime" label="失效时间">
+                  <template slot-scope="scope">
+                      {{scope.row.endTime | formateTime}}
+                  </template>
+              </el-table-column>
+          </el-table>
+          <div slot="footer" class="dialog-footer">
+              <el-button @click="hisDialogVisiable = false">取 消</el-button>
+              <el-button type="primary" @click="hisDialogVisiable=false">确 定</el-button>
+          </div>
+      </el-dialog>
   </div>
 </template>
 
 <script>
-    import { addSubEquipment,updateSubEquipment,getSubEquipmentList,getEquipmentByEquipmentId } from '../../api/equipmentDetail'
+    import { addSubEquipment,updateSubEquipment,getSubEquipmentList,getEquipmentByEquipmentId,calcSwitch
+        ,getSubEquipmentCalcLogList } from '../../api/equipmentDetail'
     import localCache from "../../util/localCache";
+    import Icons from "../svg-icons/index";
 export default {
   name: "equipmentDetail",
-  data() {
+    components: {Icons},
+    data() {
     return {
         equipmentId: '',
         opFlag:'add',
         currentTab:'0',
       addDialogVisiable: false,
       confirmVisible: false,
+        hisDialogVisiable: false,
       formLabelWidth: '120px',
         equipmentDetail: {},
       subTableData: [],
-        staffTableData:[],
-        priceTableData:[],
+        staffTableData: [],
+        priceTableData: [],
+        hisTableData1: [],
+        hisTableData2: [],
       addForm: {
           subEquipmentName: '',
           type:''
@@ -125,6 +187,12 @@ export default {
             ],
         },
         listLoading: true,
+        switchObj:{
+            type:'',
+            status:'',
+            msg:'',
+            flag: true
+        }
     }
   },
     created () {
@@ -223,41 +291,138 @@ export default {
               }
           }).catch(() => {
           })
+      },
+      staffTypeCalcChange(newVal){
+          this.switchObj.type = 1
+          this.switchObj.status = newVal
+          if(newVal == 1){
+              this.switchObj.msg = '确认开启员工类型计费?'
+          }else{
+              this.switchObj.msg = '确认关闭员工类型计费?'
+          }
+          this.confirmVisible = true
+          this.switchObj.flag = true
+      },
+      shiftCalc(newVal){
+          this.switchObj.type = 2
+          this.switchObj.status = newVal
+          if(newVal == 1){
+              this.switchObj.msg = '确认开启班次类型计费?'
+          }else{
+              this.switchObj.msg = '确认关闭班次类型计费?'
+          }
+          this.confirmVisible = true
+          this.switchObj.flag = true
+      },
+      switchClick(row,column){
+          this.selectRow = row
+          console.log(row,column)
+      },
+      confirmHandler(){
+          this.switchObj.customerId = localCache.getCurrentCustomerId()
+          this.switchObj.subEquipmentId=this.selectRow.subEquipmentId
+          calcSwitch({
+              customerId: localCache.getCurrentCustomerId(),
+              subEquipmentId: this.selectRow.subEquipmentId,
+              status: this.switchObj.status,
+              type: this.switchObj.type,
+          }).then((res)=>{
+              if(res.errorcode==0){
+                  this.$message.success('修改成功')
+                  this.switchObj.flag = false
+                  this.confirmVisible = false
+              }else{
+                  this.$message.error(res.message)
+              }
+          })
+      },
+      confirmCloseHandler(){
+          if(!this.switchObj.flag){
+              return
+          }
+          if(this.switchObj.type == 2){
+              if(this.switchObj.status==1){
+                  this.selectRow.shiftCalc = 0
+              }else{
+                  this.selectRow.shiftCalc = 1
+              }
+          }else if(this.switchObj.type == 1){
+              if(this.switchObj.status==1){
+                  this.selectRow.staffTypeCalc = 0
+              }else{
+                  this.selectRow.staffTypeCalc = 1
+              }
+          }
+      },
+      switchHis(row){
+          console.log(123)
+          this.hisDialogVisiable = true
+          getSubEquipmentCalcLogList({
+              subEquipmentId: row.subEquipmentId,
+              customerId: localCache.getCurrentCustomerId()
+          }).then(res => {
+              this.listLoading = false
+              if (res.errorcode !== 0) {
+                  this.$message.error(res.message)
+              } else {
+                  this.hisTableData1 = res.data.his1
+                  this.hisTableData2 = res.data.his2
+              }
+          }).catch(() => {
+              this.listLoading = false
+          })
       }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-    .equip-detail-content{
-        margin-top: 25px;
-    }
-.t-top-bar{
-  margin-bottom: 15px;
-}
+<style lang="scss">
+    .equip-detail-container{
+        .el-switch__label{
+            color:#ccc;
+        }
+        .el-switch__label.is-active {
+            color: #409EFF !important;
+        }
+        .equip-detail-content{
+            margin-top: 25px;
+        }
+        .t-top-bar{
+            margin-bottom: 15px;
+        }
 
-.l-add-buttion{
-  font-size: 35px;
-  float: right;
-  cursor: pointer;
-}
-.equip-detail-top {
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-}
-.equip-item {
-    width: 33%;
-    height: 45px;
-    margin-bottom: 15px;
-}
-.equip-itme-name {
-    background: #f8f9fc;
-    display: inline-block;
-    height: 35px;
-    width: 100px;
-    line-height: 35px;
-    text-align: center;
-    margin-right: 15px;
-}
+        .l-add-buttion{
+            font-size: 35px;
+            float: right;
+            cursor: pointer;
+        }
+        .equip-detail-top {
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+        .equip-item {
+            width: 33%;
+            height: 45px;
+            margin-bottom: 15px;
+        }
+        .equip-itme-name {
+            background: #f8f9fc;
+            display: inline-block;
+            height: 35px;
+            width: 100px;
+            line-height: 35px;
+            text-align: center;
+            margin-right: 15px;
+        }
+        .calc-his-dialog .el-dialog__body {
+            max-height: 550px;
+            overflow: auto;
+        }
+        .calc-his-title{
+            padding: 8px 0;
+            font-size: 16px;
+        }
+    }
+
 </style>

@@ -57,3 +57,19 @@ export function getEquipmentByEquipmentId(params) {
         params
     })
 }
+export function calcSwitch(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/calcSwitch',
+        method: 'post',
+        params
+    })
+}
+export function getSubEquipmentCalcLogList(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getSubEquipmentCalcLogList',
+        method: 'get',
+        params
+    })
+}

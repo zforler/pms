@@ -7,7 +7,7 @@ import Layout from "@/components/layout/Layout";
 import login from "@/page/login/login";
 import Company from "@/components/Company/Company";
 import {Table,TableColumn, Button,Select,Input,Option,Dialog,Form,FormItem,Pagination,Tree,Tooltip,Radio,RadioGroup,
-    Message,Autocomplete,Loading,DatePicker,Cascader,TimePicker,TabPane,Tabs,Popover,Upload} from "element-ui";
+    Message,Autocomplete,Loading,DatePicker,Cascader,TimePicker,TabPane,Tabs,Popover,Upload,Switch} from "element-ui";
 import './icons';
 import localCache from "./util/localCache";
 import { findUserMenus } from '@/api/menu'
@@ -49,6 +49,7 @@ Vue.use(Tabs)
 Vue.use(TabPane)
 Vue.use(Popover)
 Vue.use(Upload)
+Vue.use(Switch)
 
 const temp = {
   template: `<router-view></router-view>`
