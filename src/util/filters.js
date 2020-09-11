@@ -97,6 +97,5 @@ export function formateHourTime(timestamp){
     return `${h}:${m}:${s}`
 }
 export function dicFilter(value,type) {
-    console.log(store.getters.dicFilter[type+value])
     return store.getters.dicFilter[type+value]
 }
