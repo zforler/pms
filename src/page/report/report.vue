@@ -16,7 +16,7 @@
           <i class="el-icon-share el-icon-table" @click="shareHandler(scope.row)"></i>
           <i class="el-icon-notebook-1 el-icon-table" @click="hisRoleHandler(scope.row)"></i>
             <i class="el-icon-s-grid el-icon-table" @click="detailHandler(scope.row)"></i>
-
+          <i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
@@ -57,17 +57,17 @@
       </el-dialog>
 
     <el-dialog title="提示" :visible.sync="confirmVisible" width="30%" :before-close="confirmCloseHandler">
-      <span>确定删除此用户信息?</span>
+      <span>确定删除此报表?</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="confirmVisible = false">取 消</el-button>
-        <el-button type="primary" @click="confirmVisible = false">确 定</el-button>
+        <el-button type="primary" @click="deleteReport_">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-    import { addReport,updateReport,getReportList,shareReport,cancleShareReport } from '../../api/report'
+    import { addReport,updateReport,getReportList,shareReport,cancleShareReport,deleteReport } from '../../api/report'
     import { getNoReportCustomerList,getHasReportCustomerList } from '../../api/customer'
     import localCache from "../../util/localCache";
     import Layout from "@/components/layout/Layout"
@@ -115,6 +115,24 @@ export default {
   methods: {
       confirmCloseHandler(){
 
+      },
+      delHandler(row){
+          this.confirmVisible = true
+          this.selectRow = row
+      },
+      deleteReport_(){
+          deleteReport({
+              customerId:localCache.getCurrentCustomerId(),
+              reportId: this.selectRow.reportId
+          }).then((res)=>{
+              if(res.errorcode==0){
+                  this.$message.success('删除成功')
+                  this.confirmVisible = false
+                  this.getList()
+              }else{
+                  this.$message.error(res.message)
+              }
+          })
       },
       addCloseHandler(){
           this.$refs['addForm'].resetFields()

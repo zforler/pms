@@ -2,16 +2,20 @@
   <div class="organization-container">
     <div class="org-tree">
       <div class="org-tree-btns">
-        <i class="el-icon-circle-plus-outline l-operate-buttion" @click="addHandler"></i>
+        <i class="el-icon-circle-plus-outline l-operate-buttion" v-if="authedCheck('添加组织架构')" title="添加组织架构"
+           @click="addHandler"></i>
       </div>
       <el-tree   default-expand-all :data="treeData"  :props="defaultTree" :expand-on-click-node="false">
            <div class="depart-tree-node" slot-scope="{ node, data }">
                 <span v-if="data.type==3" style="width: calc(100% - 100px)" @click="treeDetailHandler(node, data)">{{ node.label+"("+data.staffCount+")" }}</span>
                <span v-else style="width: calc(100% - 100px)" @click="treeDetailHandler(node, data)">{{ node.label }}</span>
                 <span class="depart-tree-node-btn">
-                   <i class="el-icon-edit el-icon-tree" @click="() => editHandler(node, data)"></i>
-                    <i v-if="data.type==3" class="el-icon-user-solid el-icon-tree" @click="() => staffHandler(node, data)"></i>
-                   <i v-else class="el-icon-share el-icon-tree" @click="() => addSub(data)"></i>
+                   <i class="el-icon-edit el-icon-tree" v-if="authedCheck('编辑组织架构')" title="编辑组织架构"
+                      @click="() => editHandler(node, data)"></i>
+                    <i v-if="data.type==3 && authedCheck('分配员工')" class="el-icon-user-solid el-icon-tree"
+                       @click="() => staffHandler(node, data)" title="分配员工"></i>
+                   <i v-else class="el-icon-share el-icon-tree" v-if="authedCheck('添加下级组织架构')" title="添加下级组织架构"
+                      @click="() => addSub(data)"></i>
                 </span>
             </div>
       </el-tree>
@@ -46,7 +50,8 @@
                 <el-table-column label="操作" width="100">
                     <template slot-scope="scope">
                         <el-tooltip content="移除" placement="top">
-                            <i class="el-icon-delete el-icon-table" @click="rightStaffRemoveHandler(scope.row)"></i>
+                            <i class="el-icon-delete el-icon-table" v-if="authedCheck('移除员工')" title="移除员工"
+                               @click="rightStaffRemoveHandler(scope.row)"></i>
                         </el-tooltip>
                     </template>
                 </el-table-column>

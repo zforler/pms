@@ -4,7 +4,8 @@
       <el-input placeholder="请输入内容" v-model="listQuery.keyword" class="input-with-select search-input">
         <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getList">搜索</el-button>
       </el-input>
-      <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
+      <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加班次')" title="添加班次"
+         @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
       <el-table-column prop="shiftId" label="班次编号" width="80"></el-table-column>
@@ -26,7 +27,8 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
+          <i class="el-icon-edit el-icon-table" v-if="authedCheck('编辑班次')" title="编辑班次"
+             @click="editHandler(scope.row)"></i>
             <i class="el-icon-notebook-1 el-icon-table" @click="hisHandler(scope.row)"></i>
         </template>
       </el-table-column>

@@ -23,13 +23,14 @@
 
         <a class="el-icon-download l-down-buttion" title="导入模板下载" href="/staffImport.xlsx"
            download="员工导入模板"></a>
-        <el-upload
+        <el-upload v-if="authedCheck('导入员工')" title="导入员工"
                 class="upload-demo" :data="uploadParam"
                 :action="uploadUrl" :show-file-list="false"
                 :multiple="false" :on-success="uploadHandler" :on-progress="uploadProgressHandler">
             <i class=" el-icon-upload2 l-add-buttion"></i>
         </el-upload>
-        <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
+        <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加员工')" title="添加员工"
+           @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
       <el-table-column prop="staffNo" label="员工编号" width="150"></el-table-column>
@@ -69,9 +70,12 @@
       <!--<el-table-column prop="idcard" label="身份证号" width="150"></el-table-column>-->
       <el-table-column fixed="right" width="140" label="操作">
         <template slot-scope="scope">
-          <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
-            <i class="el-icon-folder-add el-icon-table" @click="unBindCardHandler(scope.row)"></i>
-          <i class="el-icon-bank-card el-icon-table" @click="bindCardHandler(scope.row)"></i>
+          <i class="el-icon-edit el-icon-table" v-if="authedCheck('编辑员工')" title="编辑员工"
+             @click="editHandler(scope.row)"></i>
+            <i class="el-icon-folder-add el-icon-table" v-if="authedCheck('绑定IC卡')" title="绑定IC卡"
+               @click="unBindCardHandler(scope.row)"></i>
+          <i class="el-icon-bank-card el-icon-table" v-if="authedCheck('解绑IC卡')" title="解绑IC卡"
+             @click="bindCardHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>

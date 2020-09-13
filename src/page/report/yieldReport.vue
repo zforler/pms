@@ -1,5 +1,5 @@
 <template>
-    <div class="record-report-container">
+    <div class="yield-report-container">
         <div class="t-top-bar">
             <div class="report-op">
                 <el-date-picker  v-model="selectTime" type="datetimerange" :picker-options="pickerOptions"
@@ -10,37 +10,17 @@
             <div class="report-op"><i class="el-icon-download l-add-buttion" @click="exportExcel"></i></div>
         </div>
         <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
-            <el-table-column prop="delivery_sub_id" label="终端编号"></el-table-column>
             <el-table-column prop="staff_no" label="工号"></el-table-column>
             <el-table-column prop="staff_name" label="员工名称"></el-table-column>
-            <el-table-column prop="staff_type" label="员工类型">
-                <template slot-scope="scope">
-                    {{scope.row.staff_type | dicFilter('STAFF_TYPE')}}
-                </template>
-            </el-table-column>
             <el-table-column prop="department_name" label="组别"></el-table-column>
-            <el-table-column prop="batch_name" label="批次"></el-table-column>
             <el-table-column prop="production_name" label="产品名称" width="180"></el-table-column>
             <el-table-column prop="spec_name" label="规格名称"></el-table-column>
             <el-table-column prop="technology_name" label="工艺名称"></el-table-column>
-            <el-table-column prop="shift_name" label="班次">
-                <template slot-scope="scope">
-                    {{scope.row.shift_name || '--'}}
-                </template>
-            </el-table-column>
             <el-table-column prop="dispatch_kg" label="发料(kg)" width="80"></el-table-column>
             <el-table-column prop="delivery_kg" label="交料(kg)" width="80"></el-table-column>
-            <el-table-column prop="yield" label="出成率(%)" width="90"></el-table-column>
-            <el-table-column prop="price" label="单价(元)"></el-table-column>
-            <el-table-column prop="total_price" label="总价(元)"></el-table-column>
-            <el-table-column prop="record_time" label="记录时间" width="180">
+            <el-table-column prop="yield_t" label="出成率(%)" width="90">
                 <template slot-scope="scope">
-                    {{scope.row.record_time | formateTime()}}
-                </template>
-            </el-table-column>
-            <el-table-column prop="report_time" label="上传时间" width="180">
-                <template slot-scope="scope">
-                    {{scope.row.report_time | formateTime()}}
+                    {{(scope.row.delivery_kg/scope.row.dispatch_kg* 100).toFixed(2)}}
                 </template>
             </el-table-column>
         </el-table>
@@ -48,7 +28,7 @@
 </template>
 
 <script>
-    import { getRecordList } from '../../api/record'
+    import { getYieldReportList } from '../../api/record'
     import {tableDataToExcel} from '../../util/util'
     import localCache from "../../util/localCache";
     export default {
@@ -86,68 +66,40 @@
                 },
                 selectTime: '',
                 exportColumn: {
-                    'record_id':'记录编号',
-                    'customer_id':'客户编号',
-                    'equipment_id':'设备编号',
-                    'dispatch_sub_id':'发料终端',
-                    'delivery_sub_id':'交料终端',
-                    'dispatch_card_no':'发料卡号',
-                    'delivery_card_no':'交料卡号',
-                    'price_type':'计价类型',
-                    'dispatch_kg':'发料(kg)',
-                    'delivery_count':'交料(数量)',
-                    'delivery_kg':'交料(kg)',
-                    'yield':'出成率(%)',
-                    'price':'单价(元)',
-                    'total_price':'总价(元)',
-                    'price_id':'计价规则编号',
                     'staff_no':'员工编号',
                     'staff_name':'员工名称',
-                    'staff_type':'员工类型',
-                    'department_id':'组编号',
-                    'department_name':'组名称',
-                    'production_id':'产品编号',
+                    'department_name':'组别',
                     'production_name':'产品名称',
-                    'spec_id':'规格编号',
                     'spec_name':'规格名称',
-                    'technology_id':'工艺编号',
                     'technology_name':'工艺名称',
-                    'shift_id':'班次编号',
-                    'shift_name':'班次',
-                    'delay_time':'班次延时',
-                    'batch_id':'批次编号',
-                    'batch_name':'批次名称',
-                    'record_time':'记录时间',
-                    'report_time':'上报时间',
-                    'calc_time':'计算时间',
-                    'year':'年',
-                    'month':'月',
-                    'day':'日',
-                    'append':'备注',
+                    'dispatch_kg':'发料(kg)',
+                    'delivery_kg':'交料(kg)',
+                    'yield_t':'出成率(%)',
                 }
+
             }
         },
         mounted(){
             let now = new Date()
             let start = new Date(now.getFullYear(),now.getMonth(),now.getDate(),0,0)
             this.selectTime = [start,now]
-            this.getRecordList_()
+            this.getYieldReportList_()
         },
         methods: {
             exportExcel(){
-                tableDataToExcel(this.tableData,'生产记录',this.exportColumn)
+                tableDataToExcel(this.tableData,'出成率',this.exportColumn)
             },
             search(){
-                this.getRecordList_()
+                this.getYieldReportList_()
             },
-            getRecordList_(){
+            getYieldReportList_(){
                 console.log(this.selectTime)
                 if(!this.selectTime){
                     this.$message.error('请选择开始结束时间')
                     return
                 }
                 this.listLoading = true
-                getRecordList({
+                getYieldReportList({
                     customerId: localCache.getCurrentCustomerId(),
                     beginTime: parseInt(this.selectTime[0].getTime()/1000),
                     endTime: parseInt(this.selectTime[1].getTime()/1000),
@@ -167,7 +119,7 @@
 </script>
 
 <style lang="scss">
-    .record-report-container{
+    .yield-report-container{
         .t-top-bar{
             display: flex;
         }

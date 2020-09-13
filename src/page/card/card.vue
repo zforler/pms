@@ -10,14 +10,14 @@
         </el-select>
         <a class="el-icon-download l-down-buttion" title="导入模板下载" href="/cardImport.xlsx"
            download="IC卡导入模板"></a>
-        <el-upload
-                class="upload-demo" :data="uploadParam"
-                :action="uploadUrl" :show-file-list="false"
+        <el-upload v-if="authedCheck('导入IC卡')" title="导入IC卡"
+                class="upload-demo" :data="uploadParam" :action="uploadUrl" :show-file-list="false"
                 :multiple="false" :on-success="uploadHandler" :on-progress="uploadProgressHandler">
             <i class=" el-icon-upload2 l-add-buttion"></i>
         </el-upload>
 
-        <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
+        <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加IC卡')" title="添加IC卡"
+           @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column prop="cardId" label="IC卡编号" width="100"></el-table-column>
@@ -41,9 +41,12 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
-          <i v-if="scope.row.status==0" class="el-icon-unlock el-icon-table" @click="lockHandler(scope.row)"></i>
-          <i v-else class="el-icon-lock el-icon-table" @click="unlockHandler(scope.row)"></i>
+          <i class="el-icon-edit el-icon-table" v-if="authedCheck('IC卡编辑')" title="IC卡编辑"
+             @click="editHandler(scope.row)"></i>
+          <i v-if="scope.row.status==0 && authedCheck('IC卡锁定')" class="el-icon-unlock el-icon-table"
+             title="IC卡锁定" @click="lockHandler(scope.row)"></i>
+          <i v-else-if="scope.row.status!=0 && authedCheck('IC卡解锁')" class="el-icon-lock el-icon-table"
+             title="IC卡解锁" @click="unlockHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>

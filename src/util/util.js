@@ -52,7 +52,8 @@ let columns = {
     'year':'年',
     'month':'月',
     'day':'日',
-    'append':'备注'
+    'append':'备注',
+    'yield_t':'出成率(%)',//计算得出
 }
 
 let formatter = {
@@ -67,12 +68,24 @@ let formatter = {
     },
     staff_type(val){
         return store.getters.dicFilter['STAFF_TYPE'+val]
+    },
+    yield_t(val,row){
+        return (row.delivery_kg/row.dispatch_kg* 100).toFixed(2)
+    },
+    total_price(val){
+        return (val/ 100).toFixed(2)
+    },
+    delivery_kg(val){
+        return (val/ 100).toFixed(2)
+    },
+    dispatch_kg(val){
+        return (val/ 100).toFixed(2)
     }
 }
 
-function format(key,val){
+function format(key,val,row){
     if(formatter[key]){
-        return formatter[key](val)
+        return formatter[key](val,row)
     }
     return val
 }
@@ -82,23 +95,27 @@ function loadExcel (url, fileName) {
     link.download = fileName // dowload属性指定文件名
     link.click()
 }
+function mixColumn(column){
+
+}
 /**
  * 将表格数据转化为 excel 表格，并自动下载
  * @param tableData
  * @param columns
  */
 export function tableDataToExcel (tableData = [],title, area) {
+    let column_ = area?area:columns
     // 初始化表格模板
-    let str = generateColumnsHeading2(columns)
+    let str = generateColumnsHeading2(column_)
     // 循环遍历，每行加入tr标签，每个单元格加td标签
     let row
     for (let i = 0, len = tableData.length; i < len; i++) {
         row = tableData[i]
         str += '<tr>'
         let val
-        for (let key in columns) {
+        for (let key in column_) {
             val = row[key]
-            str += `<td class="numtostr">${(val === undefined || val === null) ? '' :format(key, val)}</td>`
+            str += `<td class="numtostr">${(val === undefined || val === null) ? '' :format(key, val,row)}</td>`
         }
         str += '</tr>'
     }

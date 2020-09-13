@@ -25,7 +25,8 @@
           <el-tabs type="border-card" v-model="currentTab">
               <el-tab-pane label="终端管理">
                   <div class="t-top-bar">
-                      <i class="el-icon-circle-plus-outline l-add-buttion" @click="subAddHandler"></i>
+                      <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加终端')" title="添加终端"
+                         @click="subAddHandler"></i>
                   </div>
                   <el-table :data="subTableData" border style="width: 100%"@cell-click="switchClick" v-loading="listLoading">
                       <el-table-column prop="subEquipmentId" label="终端编号"></el-table-column>
@@ -58,7 +59,8 @@
                       </el-table-column>
                       <el-table-column label="操作">
                           <template slot-scope="scope">
-                              <i class="el-icon-edit el-icon-table" @click="subEditHandler(scope.row)"></i>
+                              <i class="el-icon-edit el-icon-table" v-if="authedCheck('编辑终端')" title="编辑终端"
+                                 @click="subEditHandler(scope.row)"></i>
                               <i class="el-icon-tickets el-icon-table" @click="switchHis(scope.row)"></i>
                           </template>
                       </el-table-column>

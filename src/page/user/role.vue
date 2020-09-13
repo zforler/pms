@@ -4,7 +4,8 @@
       <el-input placeholder="请输入内容" v-model="listQuery.keyword" class="input-with-select search-input">
         <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getList">搜索</el-button>
       </el-input>
-      <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
+      <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加角色')" title="添加角色"
+         @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
       <el-table-column prop="roleId" label="角色编号" width="100"></el-table-column>
@@ -21,8 +22,10 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
-          <i class="el-icon-delete el-icon-table" @click="delHandler(scope.row)"></i>
+          <i class="el-icon-edit el-icon-table" v-if="authedCheck('修改角色')" title="修改角色"
+             @click="editHandler(scope.row)"></i>
+          <i class="el-icon-delete el-icon-table" v-if="authedCheck('删除角色')" title="删除角色"
+             @click="delHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
@@ -98,7 +101,8 @@ export default {
         total: 0,
         listLoading: true,
         opFlag:'add',
-        selectRow: ''
+        selectRow: '',
+        flatTree:{}
     }
   },
     mounted(){
@@ -170,19 +174,44 @@ export default {
                   let arr = []
                   this.setCheckKeys(arr,res.data)
                   this.defaultCheckedKeys = arr
-                  console.log(arr)
+                 this.flatTree = this.flatTreeData(this.treeData)
               }
           })
       },
       setCheckKeys(arr=[],treeData){
           for (let i = 0,len=treeData.length; i < len; i++) {
-              if(treeData[i].authed == 1){
+              if(treeData[i].authed == 1 && !treeData[i].children){
                   arr.push(treeData[i].menuId)
               }
               if(treeData[i].children){
                   this.setCheckKeys(arr,treeData[i].children)
               }
           }
+      },
+      flatTreeData(treeData, arr=[], obj={}){
+          for (let i = 0,len=treeData.length; i <len ; i++) {
+              if(treeData[i].children){
+                  arr.push(treeData[i].menuId)
+                  this.flatTreeData(treeData[i].children, arr, obj)
+                  arr = []
+              }else{
+                  obj[treeData[i].menuId] = arr.slice()
+              }
+          }
+          return obj
+      },
+      getSelecNodeId(select){
+        console.log(this.flatTree, select)
+        let arr = []
+          for (let i = 0, len = select.length; i < len; i++) {
+              let t = this.flatTree[select[i]]
+              arr.push(select[i])
+               if(t){
+                   arr.push(...t)
+               }
+
+          }
+          return [...new Set(arr)].join(',')
       },
       addConfirm() {
           this.$refs['addForm'].validate((valid) => {
@@ -203,7 +232,9 @@ export default {
                   })
                   return
               }
-              param.auth = arr.join(',')
+              // param.auth = arr.join(',')
+              param.auth = this.getSelecNodeId(arr)
+              console.log(param)
               param.customerId = localCache.getCurrentCustomerId()
               if(this.opFlag=='add'){
                   addRole(param).then((res)=>{

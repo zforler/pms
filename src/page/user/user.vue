@@ -4,7 +4,8 @@
       <el-input placeholder="请输入内容" v-model="listQuery.keyword" class="input-with-select search-input">
         <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getList">搜索</el-button>
       </el-input>
-      <i class="el-icon-circle-plus-outline l-add-buttion" @click="addHandler"></i>
+      <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加用户')" title="添加用户"
+         @click="addHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%"  v-loading="listLoading">
       <el-table-column prop="userId" label="用户编号" width="100"></el-table-column>
@@ -19,10 +20,13 @@
       <el-table-column prop="roleName" label="用户角色"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <i class="el-icon-edit el-icon-table" @click="editHandler(scope.row)"></i>
-          <i v-if="scope.row.status==0" class="el-icon-unlock el-icon-table" @click="setLockHandler(scope.row)"></i>
-          <i v-else class="el-icon-lock el-icon-table" @click="setLockHandler(scope.row)"></i>
-          <i class="el-icon-refresh-left el-icon-table" @click="resetHandler(scope.row)"></i>
+          <i class="el-icon-edit el-icon-table" v-if="authedCheck('修改用户')" title="修改用户"
+             @click="editHandler(scope.row)"></i>
+          <i v-if="scope.row.status==0 && authedCheck('锁定用户')" class="el-icon-unlock el-icon-table"
+             @click="setLockHandler(scope.row)"></i>
+          <i v-else-if="scope.row.status!=0 && authedCheck('解锁用户')" class="el-icon-lock el-icon-table" @click="setLockHandler(scope.row)"></i>
+          <i class="el-icon-refresh-left el-icon-table" v-if="authedCheck('重置用户密码')" title="重置用户密码"
+             @click="resetHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
