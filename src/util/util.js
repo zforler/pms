@@ -8,7 +8,7 @@ function isObject(val){
     return Object.prototype.toString.call(val) === '[object Object]'
 }
 function generateColumnsHeading2 (columns = {}) {
-    let columnsHeading = '<tr style="text-align: center;font-weight: bold;height: 35px;background-color: #356DB3;color:#ffffff">'
+    let columnsHeading = '<tr style="text-align: center;font-weight: bold;height: 35px;color:#000000">'
     for (let key in columns) {
         if(isObject(columns[key])){
             columnsHeading += `<td>${columns[key].title}</td>`
@@ -20,7 +20,18 @@ function generateColumnsHeading2 (columns = {}) {
     columnsHeading += '</tr>'
     return columnsHeading
 }
+function generateListHeading2 (data = []) {
+    let columnsHeading = '<tr style="text-align: center;font-weight: bold;height: 35px;color:#000000">'
+    for (let i = 0, len = data.length; i < len; i++) {
+        let row = data[i];
+        for (let j = 0, lenj = row.length; j < lenj; j++) {
+            columnsHeading += `<td>${row[j]}</td>`
+        }
 
+    }
+    columnsHeading += '</tr>'
+    return columnsHeading
+}
 let columns = {
     'record_id':'记录编号',
     'customer_id':'客户编号',
@@ -73,6 +84,9 @@ let formatter = {
     calc_time(val){
         return formateTime(val)
     },
+    price_type(val){
+        return store.getters.dicFilter['PRICE_TYPE'+val]
+    },
     staff_type(val){
         return store.getters.dicFilter['STAFF_TYPE'+val]
     },
@@ -90,6 +104,9 @@ let formatter = {
     },
     commonPrice(val){
         return (val/ 100).toFixed(2)
+    },
+    commonTime(val){
+        return formateTime(val)
     }
 
 }
@@ -97,6 +114,9 @@ let formatter = {
 function format(key,val,row){
     if(formatter[key]){
         return formatter[key](val,row)
+    }
+    if(val===undefined || val === null){
+        return '--'
     }
     return val
 }
@@ -128,25 +148,25 @@ export function tableDataToExcel (tableData = [],title, area) {
             val = row[key]
             let columnVal = column_[key]
             let tempVal = ''
-            if(val !== undefined && val !== null){
-                if(columnVal === undefined || columnVal === null){
+            if(columnVal === undefined || columnVal === null){
 
-                }else if(isObject(columnVal)){
-                    if(columnVal.fk instanceof Function){
-                        tempVal = columnVal.fk(val,row)
-                    }else{
-                        tempVal = format(columnVal.fk, val,row)
-                    }
+            }else if(isObject(columnVal)){
+                if(columnVal.fk instanceof Function){
+                    tempVal = columnVal.fk(val,row)
                 }else{
-                    tempVal = format(key, val,row)
+                    tempVal = format(columnVal.fk, val,row)
                 }
+            }else{
+                tempVal = format(key, val,row)
             }
             str += `<td class="numtostr">${tempVal}</td>`
         }
         str += '</tr>'
     }
-    console.log(str)
-    // worksheet名
+
+    loadExcel(createTemplate(title,str), title)
+}
+function createTemplate(title,str){
     let workSheet = 'sheet1'
     let uri = 'data:application/vnd.ms-excel;base64,'
     // 下载的表格模板数据
@@ -164,10 +184,60 @@ export function tableDataToExcel (tableData = [],title, area) {
         </style>
         <title>${title}</title>
         </head><body><table>${str}</table></body></html>`
-    // 下载模板
-    // window.location.href = uri + window.btoa(unescape(encodeURIComponent(template)))
-    loadExcel(uri + window.btoa(unescape(encodeURIComponent(template))), title)
+    return uri + window.btoa(unescape(encodeURIComponent(template)))
 }
+
+export function tableDataToExcel2 (tableData = [],title) {
+    let str = ''
+    for (let i = 0, len = tableData.length; i < len; i++) {
+        let type = tableData[i].type
+        if(type == 'head-map-data'){
+            let head = tableData[i].head
+            str += generateColumnsHeading2(head)
+            let body = tableData[i].body
+            let row
+            for (let j = 0, lenj = body.length; j < lenj; j++) {
+                row = body[j]
+                str += '<tr>'
+                let val
+                for (let key in head) {
+                    val = row[key]
+                    let columnVal = head[key]
+                    let tempVal = ''
+                    if(columnVal === undefined || columnVal === null){
+
+                    }else if(isObject(columnVal)){
+                        if(columnVal.fk instanceof Function){
+                            tempVal = columnVal.fk(val,row)
+                        }else{
+                            tempVal = format(columnVal.fk, val,row)
+                        }
+                    }else{
+                        tempVal = format(key, val,row)
+                    }
+                    str += `<td class="numtostr">${tempVal}</td>`
+                }
+                str += '</tr>'
+            }
+        }else if(type == 'list-data'){
+            let body = tableData[i].body
+            for (let j = 0, lenj = body.length; j < lenj; j++) {
+                let row = body[j]
+                str += '<tr>'
+                for (let k = 0, lenk = row.length; k < lenk; k++) {
+                    str += `<td class="numtostr">${row[k]}</td>`
+                }
+                str += '</tr>'
+            }
+        }else if(type == 'head-list'){
+            str += generateListHeading2(tableData[i].body)
+        }
+
+
+    }
+    loadExcel(createTemplate(title,str), title)
+}
+
 
 
 export function formateTime(timestamp, reg='yyyy-MM-dd hh:mm:ss'){

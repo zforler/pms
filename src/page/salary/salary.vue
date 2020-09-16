@@ -126,8 +126,8 @@
                         fk:'commonPrice'
                     },
                     'totalcount':{
-                        title: '合计工资(元))',
-                        fk: function(val,row){
+                        title: '合计工资(元)',
+                        fk(val,row){
                             return ((row.total_price+row.adjust+row.subsidy)/ 100).toFixed(2)
                         }
                     },

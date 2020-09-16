@@ -76,7 +76,7 @@
     import { getStaffByStaffNo } from '../../api/staff'
     import { getStaffDayRecordList } from '../../api/record'
     import { getSalaryAdjustLogList } from '../../api/salary'
-    import {tableDataToExcel,formateTime} from '../../util/util'
+    import {tableDataToExcel2,formateTime} from '../../util/util'
     import localCache from "../../util/localCache";
     export default {
         name: "daySalaryDetailReport",
@@ -87,34 +87,70 @@
                 adjustListLoading: false,
                 formLabelWidth: '120px',
                 tableData: [],
+                tableDataSum: '',
                 adjustTableData: [],
+                adjustTableDataSum:'',
                 selectTime: new Date(),
                 exportColumn: {
-                    'staff_no':'员工编号',
-                    'staff_name':'员工名称',
-                    'staff_type':'员工名称',
-                    'department_name':'组别',
-                    'production_name':'产品名称',
-                    'spec_name':'规格名称',
-                    'technology_name':'工艺名称',
-                    'total_price':{
-                        title:'工资(元)',
+                    'empty':{
+                      title:'',
+                      fk(){
+                          return ''
+                      }
+                    },
+                    'department_name':'班组',
+                    'production_name':'产品',
+                    'spec_name':'规格',
+                    'technology_name':'工艺',
+                    'price_type':{
+                        title:'计价类型',
+                        fk:'price_type'
+                    },
+                    'dispatch_kg':{
+                        title:'发料(kg)',
                         fk:'commonPrice'
                     },
+                    'delivery_kg':{
+                        title:'交料(kg)',
+                        fk:'commonPrice'
+                    },
+                    'delivery_count':'数量',
+                    'price':{
+                        title: '单价(元)',
+                        fk:'commonPrice'
+                    },
+                    'total_price':{
+                        title: '总价(元)',
+                        fk:'commonPrice'
+                    },
+                },
+                exportAdjustColumn:{
+                    'empty':{
+                        title:'',
+                        fk(){
+                            return ''
+                        }
+                    },
                     'adjust':{
-                        title: '调整项(元)',
+                        title:'调整项(元)',
                         fk:'commonPrice'
                     },
                     'subsidy':{
-                        title: '补贴项(元)',
+                        title:'补贴项(元)',
                         fk:'commonPrice'
                     },
-                    'totalcount':{
-                        title: '合计工资(元))',
-                        fk: function(val,row){
-                            return ((row.total_price+row.adjust+row.subsidy)/ 100).toFixed(2)
+                    'total_sum':{
+                        title:'总计(元)',
+                        fk:function(val,row){
+                            return ((row.adjust+row.subsidy)/ 100).toFixed(2)
                         }
                     },
+                    'updateTime':{
+                        title: '调整时间',
+                        fk:'commonTime'
+                    },
+                    'userName':'操作人',
+                    'append':'备注',
                 },
                 staffNo:'',
                 year: '',
@@ -153,12 +189,36 @@
         },
         methods: {
             exportExcel(){
-                if(!this.selectTime){
-                    this.$message.error('请选择时间')
-                    return
-                }
-                let title = formateTime(this.selectTime,'yyyy-MM-dd')+' '+"工资统计"
-                tableDataToExcel(this.tableData, title,this.exportColumn)
+                let title = `${this.staff.staffName}${this.year}年${this.month}月${this.day}日工资明细`
+                tableDataToExcel2([
+                    {
+                        body: [['','员工编号','员工姓名','结算日期','调整前工资','调整金额','调整后工资']],
+                        type:'head-list'
+                    },
+                    {
+                        body: [['',this.staffNo,this.staff.staffName,`${this.year}年${this.month}月${this.day}日`
+                            ,`${this.recordPrice}元`,`${this.adjustPricce}元`,`${this.totalPrice}元`]],
+                        type:'list-data'
+                    },
+                    {
+                        head: this.exportColumn,
+                        body: this.tableData,
+                        type:'head-map-data'
+                    },
+                    {
+                        body: [this.tableDataSum],
+                        type:'list-data'
+                    },
+                    {
+                        head: this.exportAdjustColumn,
+                        body: this.adjustTableData,
+                        type:'head-map-data'
+                    },
+                    {
+                        body: [this.adjustTableDataSum],
+                        type:'list-data'
+                    },
+                ], title)
             },
             getSummaries(param){
                 const { columns, data } = param;
@@ -191,12 +251,11 @@
                         sums[index] = '/';
                     }
                 });
-                console.log(sums)
                 if(data[0]){
                     sums[9] = (data[0].price/100).toFixed(2)
                     this.recordPrice = (Number.parseFloat(sums[10])).toFixed(2)
                 }
-
+                this.tableDataSum = sums
                 return sums;
             },
             getAdjustSummaries(param){
@@ -228,7 +287,7 @@
                     sums[3] = (parseFloat(sums[1]) + parseFloat(sums[2])).toFixed(2)
                     this.adjustPricce = sums[3]
                 }
-
+                this.adjustTableDataSum = sums
                 return sums;
             },
             getStaffDayRecordList_(){
