@@ -84,6 +84,16 @@ class LocalCache{
     getReport(path){
         return JSON.parse(this.cache.getItem(path))
     }
+    setCurrentDaySalaryDetailParam(param){
+        this.cache.setItem('cdsdp',JSON.stringify(param))
+    }
+    getCurrentDaySalaryDetailParam(){
+        let cdsdp = this.cache.getItem('cdsdp')
+        if(cdsdp){
+            return JSON.parse(cdsdp)
+        }
+        return null
+    }
 }
 let localCache = new LocalCache();
 export default localCache

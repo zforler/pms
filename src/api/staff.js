@@ -91,3 +91,11 @@ export function unbindCards(params) {
         params
     })
 }
+export function getStaffByStaffNo(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getStaffByStaffNo',
+        method: 'get',
+        params
+    })
+}

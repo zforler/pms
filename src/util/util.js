@@ -4,11 +4,18 @@ import store from "./store";
  * @param columns 例如：['编号','名称']
  * @returns {string} 例如：<tr><td>编号</td>名称<td></td></tr>
  */
-
+function isObject(val){
+    return Object.prototype.toString.call(val) === '[object Object]'
+}
 function generateColumnsHeading2 (columns = {}) {
     let columnsHeading = '<tr style="text-align: center;font-weight: bold;height: 35px;background-color: #356DB3;color:#ffffff">'
     for (let key in columns) {
-        columnsHeading += `<td>${columns[key]}</td>`
+        if(isObject(columns[key])){
+            columnsHeading += `<td>${columns[key].title}</td>`
+        }else{
+            columnsHeading += `<td>${columns[key]}</td>`
+        }
+
     }
     columnsHeading += '</tr>'
     return columnsHeading
@@ -80,7 +87,11 @@ let formatter = {
     },
     dispatch_kg(val){
         return (val/ 100).toFixed(2)
+    },
+    commonPrice(val){
+        return (val/ 100).toFixed(2)
     }
+
 }
 
 function format(key,val,row){
@@ -115,7 +126,22 @@ export function tableDataToExcel (tableData = [],title, area) {
         let val
         for (let key in column_) {
             val = row[key]
-            str += `<td class="numtostr">${(val === undefined || val === null) ? '' :format(key, val,row)}</td>`
+            let columnVal = column_[key]
+            let tempVal = ''
+            if(val !== undefined && val !== null){
+                if(columnVal === undefined || columnVal === null){
+
+                }else if(isObject(columnVal)){
+                    if(columnVal.fk instanceof Function){
+                        tempVal = columnVal.fk(val,row)
+                    }else{
+                        tempVal = format(columnVal.fk, val,row)
+                    }
+                }else{
+                    tempVal = format(key, val,row)
+                }
+            }
+            str += `<td class="numtostr">${tempVal}</td>`
         }
         str += '</tr>'
     }
@@ -144,15 +170,22 @@ export function tableDataToExcel (tableData = [],title, area) {
 }
 
 
-function formateTime(timestamp, reg='yyyy-MM-dd hh:mm:ss'){
-    if(!timestamp){
-        return '--'
+export function formateTime(timestamp, reg='yyyy-MM-dd hh:mm:ss'){
+    let dateObj
+
+    if(timestamp instanceof Date){
+        dateObj = timestamp
+    }else{
+        if(!timestamp){
+            return '--'
+        }
+        let tt = parseInt(timestamp)
+        if(tt < 9999999999){
+            tt *= 1000
+        }
+        dateObj = new Date(parseInt(tt))
     }
-    let tt = parseInt(timestamp)
-    if(tt < 9999999999){
-        tt *= 1000
-    }
-    const dateObj = new Date(parseInt(tt))
+
     let str = reg
     str = str.replace(/yyyy|YYYY/, dateObj.getFullYear())
 

@@ -35,3 +35,21 @@ export function getMonthSalaryReportList(params) {
         params
     })
 }
+
+export function getSalaryReportList(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getSalaryReportList',
+        method: 'get',
+        params
+    })
+}
+
+export function getStaffDayRecordList(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getStaffDayRecordList',
+        method: 'get',
+        params
+    })
+}
