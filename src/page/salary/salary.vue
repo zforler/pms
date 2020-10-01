@@ -2,6 +2,7 @@
   <div class="salary-report-container">
     <div class="t-top-bar">
       <div class="report-op">
+          <el-input placeholder="员工编号、员工姓名" v-model="keyword" class="search-input"></el-input>
           <el-date-picker v-model="selectTime" type="date" @change="dateChange"  placeholder="选择日期"></el-date-picker>
       </div>
       <div class="report-op"><el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button></div>
@@ -16,10 +17,22 @@
             </template>
         </el-table-column>
       <el-table-column prop="department_name" label="班组"></el-table-column>
-        <el-table-column prop="production_name" label="产品"></el-table-column>
-        <el-table-column prop="spec_name" label="规格"></el-table-column>
-        <el-table-column prop="technology_name" label="工艺"></el-table-column>
-      <el-table-column prop="total_price" label="工资(元)">
+        <el-table-column prop="kg_salary" label="计重工资(元)">
+            <template slot-scope="scope">
+                {{scope.row.kg_salary / 100}}
+            </template>
+        </el-table-column>
+        <el-table-column prop="count_salary" label="计数工资(元)">
+            <template slot-scope="scope">
+                {{scope.row.count_salary / 100}}
+            </template>
+        </el-table-column>
+        <el-table-column prop="time_salary" label="计时工资(元)">
+            <template slot-scope="scope">
+                {{scope.row.time_salary / 100}}
+            </template>
+        </el-table-column>
+      <el-table-column prop="total_price" label="工资总计(元)">
           <template slot-scope="scope">
               {{scope.row.total_price / 100}}
           </template>
@@ -105,16 +118,26 @@
                 formLabelWidth: '120px',
                 tableData: [],
                 selectTime: new Date(),
+                keyword:'',
                 exportColumn: {
                     'staff_no':'员工编号',
                     'staff_name':'员工名称',
                     'staff_type':'员工名称',
                     'department_name':'组别',
-                    'production_name':'产品名称',
-                    'spec_name':'规格名称',
-                    'technology_name':'工艺名称',
+                    'kg_salary':{
+                        title:'计重工资(元)',
+                        fk:'commonPrice'
+                    },
+                    'count_salary':{
+                        title:'计数工资(元)',
+                        fk:'commonPrice'
+                    },
+                    'time_salary':{
+                        title:'计时工资(元)',
+                        fk:'commonPrice'
+                    },
                     'total_price':{
-                        title:'工资(元)',
+                        title:'工资总计(元)',
                         fk:'commonPrice'
                     },
                     'adjust':{
@@ -171,7 +194,6 @@
                 this.getSalaryReportList_()
             },
             getSalaryReportList_(){
-                console.log(this.selectTime)
                 if(!this.selectTime){
                     this.$message.error('请选择时间')
                     return
@@ -180,7 +202,8 @@
                 getSalaryReportList({
                     customerId: localCache.getCurrentCustomerId(),
                     beginTime: parseInt(this.selectTime.getTime()/1000),
-                    endTime: 0
+                    endTime: 0,
+                    keyword: this.keyword
                 }).then(res => {
                     this.listLoading = false
                     if (res.errorcode !== 0) {
@@ -248,6 +271,10 @@
     .report-op{
       margin-right: 15px;
     }
+      .search-input{
+          width: 250px;
+          margin-right: 15px;
+      }
     .report-op:last-child{
       margin-left: auto;
     }

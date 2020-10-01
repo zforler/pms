@@ -2,6 +2,7 @@
     <div class="product-report-container">
         <div class="t-top-bar">
             <div class="report-op">
+                <el-input placeholder="员工编号、员工姓名" v-model="keyword" class="search-input"></el-input>
                 <el-date-picker  v-model="selectTime" type="datetimerange" :picker-options="pickerOptions"
                         range-separator="至"  start-placeholder="开始日期"  end-placeholder="结束日期"
                         align="right"></el-date-picker>
@@ -61,6 +62,7 @@
                     }]
                 },
                 selectTime: '',
+                keyword: '',
                 exportColumn: {
                     'production_name':'产品名称',
                     'batch_name':'批次名称',
@@ -94,6 +96,7 @@
                     customerId: localCache.getCurrentCustomerId(),
                     beginTime: parseInt(this.selectTime[0].getTime()/1000),
                     endTime: parseInt(this.selectTime[1].getTime()/1000),
+                    keyword: this.keyword
                 }).then(res => {
                     this.listLoading = false
                     if (res.errorcode !== 0) {
@@ -115,6 +118,10 @@
             display: flex;
         }
         .report-op{
+            margin-right: 15px;
+        }
+        .search-input{
+            width: 250px;
             margin-right: 15px;
         }
         .report-op:last-child{

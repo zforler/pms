@@ -22,6 +22,7 @@
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column prop="cardId" label="IC卡编号" width="100"></el-table-column>
       <el-table-column prop="cardNo" label="IC卡内码"></el-table-column>
+        <el-table-column prop="cardOutNo" label="IC卡面号"></el-table-column>
       <!--<el-table-column prop="cardName" label="IC卡名称"></el-table-column>-->
       <el-table-column prop="cardType" label="IC卡类型">
           <template slot-scope="scope">
@@ -59,9 +60,9 @@
         <el-form-item label="IC卡内码" prop="cardNo" :label-width="formLabelWidth">
           <el-input v-model="addForm.cardNo" autocomplete="off"></el-input>
         </el-form-item>
-        <!--<el-form-item label="IC卡名称" prop="cardName" :label-width="formLabelWidth">-->
-          <!--<el-input v-model="addForm.cardName" autocomplete="off"></el-input>-->
-        <!--</el-form-item>-->
+        <el-form-item label="IC卡面号" prop="cardOutNo" :label-width="formLabelWidth">
+          <el-input v-model="addForm.cardOutNo" autocomplete="off"></el-input>
+        </el-form-item>
         <el-form-item label="IC卡类型" prop="cardType" :label-width="formLabelWidth">
             <el-select :disabled="opFlag=='edit'" v-model="addForm.cardType" placeholder="请选IC卡类型">
                 <el-option v-for="(val,key) in selectDic('CARD_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
@@ -110,15 +111,16 @@ export default {
       addForm: {
           cardId: '',
           cardNo: '',
+          cardOutNo: '',
           cardName: '',
           cardType: '',
           staffId: '',
       },
         rules: {
-            // cardName: [
-            //     { required: true, message: 'IC卡名称不能为空', trigger: 'blur' },
-            //     { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
-            // ],
+            cardOutNo: [
+                { required: true, message: 'IC卡面号不能为空', trigger: 'blur' },
+                { min: 2, max: 15, message: '长度在 2 到 15 个字符', trigger: 'blur' }
+            ],
             cardNo: [
                 { required: true, message: 'IC卡内码不能为空', trigger: 'blur' },
                 { min: 2, max: 15, message: '长度在 2 到 64 个字符', trigger: 'blur' }
@@ -241,6 +243,7 @@ export default {
           this.addForm =  {
               cardId: '',
               cardNo: '',
+              cardOutNo: '',
               cardName: '',
               cardType: '',
               staffId: '',

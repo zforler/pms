@@ -41,3 +41,11 @@ export function getEquipmentPageList(params) {
         params
     })
 }
+export function getSubEquipmentListAll(params={}) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getSubEquipmentListAll',
+        method: 'get',
+        params
+    })
+}

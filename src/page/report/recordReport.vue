@@ -2,6 +2,16 @@
     <div class="record-report-container">
         <div class="t-top-bar">
             <div class="report-op">
+                <el-input placeholder="员工编号、员工姓名" v-model="keyword" class="search-input"></el-input>
+                <el-cascader class="search-input" clearable v-model="searchDepart" placeholder="所属班组" :options="treeData"
+                             :props="{ expandTrigger: 'hover', label: 'name',value:'departmentId' }"></el-cascader>
+                <el-select class="search-input200" clearable v-model="subEquipmentId" placeholder="终端编号">
+                    <el-option v-for="(val,key) in subEquipments" :key="key" :label="val.subEquipmentId"
+                               :value="val.subEquipmentId"></el-option>
+                </el-select>
+                <el-select  class="search-input200" clearable v-model="priceType" placeholder="计价类型">
+                    <el-option v-for="(val,key) in selectDic('PRICE_TYPE')" :key="key" :label="val.name" :value="val.code"></el-option>
+                </el-select>
                 <el-date-picker  v-model="selectTime" type="datetimerange" :picker-options="pickerOptions"
                         range-separator="至"  start-placeholder="开始日期"  end-placeholder="结束日期"
                         align="right"></el-date-picker>
@@ -10,7 +20,8 @@
             <div class="report-op"><i class="el-icon-download l-add-buttion" @click="exportExcel"></i></div>
         </div>
         <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
-            <el-table-column prop="delivery_sub_id" label="终端编号"></el-table-column>
+            <el-table-column prop="dispatch_sub_id" label="发料终端" width="110px"></el-table-column>
+            <el-table-column prop="delivery_sub_id" label="交料终端" width="110px"></el-table-column>
             <el-table-column prop="staff_no" label="工号"></el-table-column>
             <el-table-column prop="staff_name" label="员工名称"></el-table-column>
             <el-table-column prop="staff_type" label="员工类型">
@@ -26,6 +37,11 @@
             <el-table-column prop="shift_name" label="班次">
                 <template slot-scope="scope">
                     {{scope.row.shift_name || '--'}}
+                </template>
+            </el-table-column>
+            <el-table-column prop="price_type" label="计价类型">
+                <template slot-scope="scope">
+                    {{scope.row.price_type | dicFilter('PRICE_TYPE')}}
                 </template>
             </el-table-column>
             <el-table-column prop="dispatch_kg" label="发料(kg)" width="80"></el-table-column>
@@ -50,6 +66,8 @@
 <script>
     import { getRecordList } from '../../api/record'
     import {tableDataToExcel} from '../../util/util'
+    import { getSubEquipmentListAll } from '../../api/equipment'
+    import { getDepartmentList } from '../../api/department'
     import localCache from "../../util/localCache";
     export default {
         name: "recordReport",
@@ -85,6 +103,7 @@
                     }]
                 },
                 selectTime: '',
+                keyword: '',
                 exportColumn: {
                     'record_id':'记录编号',
                     'customer_id':'客户编号',
@@ -124,7 +143,12 @@
                     'month':'月',
                     'day':'日',
                     'append':'备注',
-                }
+                },
+                subEquipments: [],
+                subEquipmentId:'',
+                searchDepart:'',
+                treeData: [],
+                priceType:''
             }
         },
         mounted(){
@@ -132,6 +156,8 @@
             let start = new Date(now.getFullYear(),now.getMonth(),now.getDate(),0,0)
             this.selectTime = [start,now]
             this.getRecordList_()
+            this.getSubEquipmentListAll_()
+            this.getTree()
         },
         methods: {
             exportExcel(){
@@ -147,10 +173,18 @@
                     return
                 }
                 this.listLoading = true
+                let departmentId = ''
+                if(this.searchDepart){
+                    departmentId = this.searchDepart[this.searchDepart.length-1]
+                }
                 getRecordList({
                     customerId: localCache.getCurrentCustomerId(),
                     beginTime: parseInt(this.selectTime[0].getTime()/1000),
                     endTime: parseInt(this.selectTime[1].getTime()/1000),
+                    keyword: this.keyword,
+                    priceType: this.priceType,
+                    subEquipmentId: this.subEquipmentId,
+                    departmentId:departmentId
                 }).then(res => {
                     this.listLoading = false
                     if (res.errorcode !== 0) {
@@ -161,7 +195,31 @@
                 }).catch(() => {
                     this.listLoading = false
                 })
-            }
+            },
+            getSubEquipmentListAll_(){
+                getSubEquipmentListAll({
+                    customerId: localCache.getCurrentCustomerId()
+                }).then(res => {
+                    if (res.errorcode !== 0) {
+                        this.$message.error(res.message)
+                    } else {
+                        this.subEquipments=  res.data
+                    }
+                }).catch(() => {
+                })
+            },
+            getTree() {
+                getDepartmentList({
+                    customerId:localCache.getCurrentCustomerId()
+                }).then(res => {
+                    if (res.errorcode !== 0) {
+                        this.$message.error(res.message)
+                    } else {
+                        this.treeData = res.data
+                    }
+                }).catch(() => {
+                })
+            },
         }
     }
 </script>
@@ -176,6 +234,14 @@
         }
         .report-op:last-child{
             margin-left: auto;
+        }
+        .search-input{
+            width: 250px;
+            margin-right: 15px;
+        }
+        .search-input200{
+            width: 200px;
+            margin-right: 15px;
         }
         .el-table td{
             padding: 0;

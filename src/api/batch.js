@@ -67,3 +67,12 @@ export function getBatchItemPageList(params) {
         params
     })
 }
+
+export function getBatchItemList(params) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/getBatchItemList',
+        method: 'get',
+        params
+    })
+}

@@ -177,6 +177,7 @@ function createTemplate(title,str){
         <x:Name>${workSheet}</x:Name>
         <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
         </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+        <meta charset='UTF-8'>
         <style type="text/css">
             .numtostr{mso-number-format: "\\@";}
             br {mso-data-placement:same-cell;}
