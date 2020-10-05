@@ -2,16 +2,20 @@
     <div class="index-container">
         <div class="index-top">
             <div class="index-top-item">
-                <span class="index-top-item-title">产品类别</span><span class="index-top-item-num">5</span>
+                <span class="index-top-item-title">产品类别</span>
+                <span class="index-top-item-num">{{ productionCount }}</span>
             </div>
             <div class="index-top-item">
-                <span class="index-top-item-title">生产总量</span><span class="index-top-item-num">555</span>
+                <span class="index-top-item-title">生产总量</span>
+                <span class="index-top-item-num">{{ productionSummary }}</span>
             </div>
             <div class="index-top-item">
-                <span class="index-top-item-title">设备数量</span><span class="index-top-item-num">5</span>
+                <span class="index-top-item-title">设备数量</span>
+                <span class="index-top-item-num">{{ productionCount }}</span>
             </div>
             <div class="index-top-item">
-                <span class="index-top-item-title">员工数量</span><span class="index-top-item-num">5</span>
+                <span class="index-top-item-title">员工数量</span>
+                <span class="index-top-item-num">{{ staffCount }}</span>
             </div>
 
         </div>
@@ -24,21 +28,59 @@
 </template>
 
 <script>
+    import { getStaffCount,getProductionCount,getEquipmentCount,getProductionSummary,
+      getProductionSummaryEveryDay,getProductionSummaryMonth} from '../../api/statistics'
     import echarts from 'echarts'
     import localCache from "../../util/localCache";
+    import {addSalaryAdjustLog} from "@/api/salary";
     export default {
         name: "index",
         data() {
             return {
-
+              staffCount: 0,
+              equipmentCount: 0,
+              productionCount: 0,
+              productionSummary: 0
             }
         },
         mounted(){
-            this.dayProductChart()
-            this.monthProductBarChart()
+          this.getProductionSummaryEveryDay_()
+            // this.dayProductChart()
+            this.monthProductBarChart_()
+          let param = {
+            customerId: localCache.getCurrentCustomerId(),
+          }
+          getStaffCount(param).then((res)=>{
+            if(res.errorcode==0){
+              this.staffCount = res.data
+            }else{
+              this.$message.error(res.message)
+            }
+          })
+          getProductionCount(param).then((res)=>{
+            if(res.errorcode==0){
+              this.productionCount = res.data
+            }else{
+              this.$message.error(res.message)
+            }
+          })
+          getEquipmentCount(param).then((res)=>{
+            if(res.errorcode==0){
+              this.equipmentCount = res.data
+            }else{
+              this.$message.error(res.message)
+            }
+          })
+          getProductionSummary(param).then((res)=>{
+            if(res.errorcode==0){
+              this.productionSummary = res.data.dispatch_kg / 100
+            }else{
+              this.$message.error(res.message)
+            }
+          })
         },
         methods: {
-            dayProductChart(){
+            dayProductChart(param){
                 let myChart = echarts.init(document.getElementById('day-product-chart'));
 
                 // 指定图表的配置项和数据
@@ -60,7 +102,7 @@
                     legend: {
                         top: 15,
                         right: 15,
-                        data: ['邮件营销', '联盟广告', '视频广告', '直接访问', '搜索引擎']
+                        data: param.title,
                     },
                     grid: {
                         left: '3%',
@@ -72,7 +114,7 @@
                         {
                             type: 'category',
                             boundaryGap: false,
-                            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+                            data: param.x
                         }
                     ],
                     yAxis: [
@@ -80,55 +122,13 @@
                             type: 'value'
                         }
                     ],
-                    series: [
-                        {
-                            name: '邮件营销',
-                            type: 'line',
-                            stack: '总量',
-                            areaStyle: {},
-                            data: [120, 132, 101, 134, 90, 230, 210]
-                        },
-                        {
-                            name: '联盟广告',
-                            type: 'line',
-                            stack: '总量',
-                            areaStyle: {},
-                            data: [220, 182, 191, 234, 290, 330, 310]
-                        },
-                        {
-                            name: '视频广告',
-                            type: 'line',
-                            stack: '总量',
-                            areaStyle: {},
-                            data: [150, 232, 201, 154, 190, 330, 410]
-                        },
-                        {
-                            name: '直接访问',
-                            type: 'line',
-                            stack: '总量',
-                            areaStyle: {},
-                            data: [320, 332, 301, 334, 390, 330, 320]
-                        },
-                        {
-                            name: '搜索引擎',
-                            type: 'line',
-                            stack: '总量',
-                            label: {
-                                normal: {
-                                    show: true,
-                                    position: 'top'
-                                }
-                            },
-                            areaStyle: {},
-                            data: [820, 932, 901, 934, 1290, 1330, 1320]
-                        }
-                    ]
+                    series: param.series
                 };
 
                 // 使用刚指定的配置项和数据显示图表。
                 myChart.setOption(option);
             },
-            monthProductBarChart(){
+            monthProductBarChart(param){
                 let myChart = echarts.init(document.getElementById('month-product-chart'));
 
                 // 指定图表的配置项和数据
@@ -144,13 +144,8 @@
                     },
                     tooltip: {},
                     dataset: {
-                        dimensions: ['product', '2015', '2016', '2017'],
-                        source: [
-                            {product: 'Matcha Latte', '2015': 43.3, '2016': 85.8, '2017': 93.7},
-                            {product: 'Milk Tea', '2015': 83.1, '2016': 73.4, '2017': 55.1},
-                            {product: 'Cheese Cocoa', '2015': 86.4, '2016': 65.2, '2017': 82.5},
-                            {product: 'Walnut Brownie', '2015': 72.4, '2016': 53.9, '2017': 39.1}
-                        ]
+                        dimensions: param.title,
+                        source: param.data
                     },
                     grid: {
                         left: '3%',
@@ -162,16 +157,119 @@
                     yAxis: {},
                     // Declare several bar series, each will be mapped
                     // to a column of dataset.source by default.
-                    series: [
-                        {type: 'bar'},
-                        {type: 'bar'},
-                        {type: 'bar'}
-                    ]
+                    series: param.series
                 };
 
                 // 使用刚指定的配置项和数据显示图表。
                 myChart.setOption(option);
-            }
+            },
+          defaulData(x){
+              let d = {}
+              x.forEach((t)=>{
+                d[t] = 0
+              })
+            return d
+          },
+          getProductionSummaryEveryDay_(){
+            getProductionSummaryEveryDay({
+              customerId: localCache.getCurrentCustomerId()
+            }).then((res)=>{
+              if(res.errorcode==0){
+                let data = res.data && res.data.data
+                let map = {}
+                let titles = new Set()
+                let list = []
+                for (let i = 0, len = data.length; i < len; i++) {
+                  let temp = data[i]
+                  if(!map[temp.production_name]){
+                  let t = {
+                      name: temp.production_name,
+                      type: 'line',
+                      stack: '总量',
+                      smooth: true,
+                      data: this.defaulData(res.data.x)
+                    }
+                    t[temp.month+'/'+temp.day] = temp.delivery_kg/100
+                    map[temp.production_name] =t
+                    list.push(t)
+                    titles.add(temp.production_name)
+                  }else{
+                    map[temp.production_name].data[temp.month+'/'+temp.day]=temp.delivery_kg/100
+                  }
+                }
+                list.forEach((t)=>{
+                  let d = []
+                  for(let k in t.data){
+                    d.push(t.data[k])
+                  }
+                  t.data = d
+                })
+                let p = {
+                  x: res.data.x,
+                  title: [...titles],
+                  series: list
+                }
+                console.log(p)
+                this.dayProductChart(p)
+              }else{
+                this.$message.error(res.message)
+              }
+            })
+          },
+          monthProductBarChart_(){
+              let endTime = parseInt(new Date().getTime()/1000)
+            getProductionSummaryMonth({
+              customerId: localCache.getCurrentCustomerId(),
+              beginTime: endTime - 365 * 86400,
+              endTime: endTime
+            }).then((res)=>{
+              if(res.errorcode==0){
+                let data = res.data && res.data.data
+                let map = {}
+                let titles = new Set()
+                titles.add('date')
+                let list = []
+                let temp
+                for (let i = 0, len = data.length; i < len; i++) {
+                  temp = data[i]
+                  let date = temp.year+'/'+temp.month
+                  if(!map[date]){
+                    map[date] = {
+                      date: date,
+                      [temp.production_name]: temp.delivery_kg/100
+                    }
+                  }else{
+                    map[date][temp.production_name] = temp.delivery_kg/100
+                  }
+                  titles.add(temp.production_name)
+                }
+                let map1 = []
+                console.log(map)
+                let x = res.data.x
+                for (let i = 0,len = x.length; i < len; i++) {
+                  map1[x[i]] = map[x[i]] || {
+                    date: x[i]
+                  }
+                }
+                for (let k in map1){
+                  list.push(map1[k])
+                }
+                let series = []
+                for (let i = 0, len = titles.size-1; i < len; i++) {
+                  series.push({type: 'bar'})
+                }
+                let p = {
+                  title: [...titles],
+                  data: list,
+                  series:series
+                }
+                console.log(p)
+                this.monthProductBarChart(p)
+              }else{
+                this.$message.error(res.message)
+              }
+            })
+          }
         }
     }
 </script>
