@@ -6,6 +6,8 @@
       </el-input>
       <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加规格')" title="添加规格"
          @click="addHandler"></i>
+      <i class="el-icon-share l-add-buttion" v-if="authedCheck('规格信息同步')" title="规格信息同步"
+         @click="dispatchHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column prop="specId" label="规格编号" width="100"></el-table-column>
@@ -42,6 +44,7 @@
         <el-button type="primary" @click="addConfirm">确 定</el-button>
       </div>
     </el-dialog>
+      <DispatchDialog ref="dispatchDialog" :dispatchType="4"></DispatchDialog>
   </div>
 </template>
 
@@ -49,8 +52,12 @@
     import { addSpec,updateSpec,getSpecList } from '../../api/spec'
     import { getProductionList } from '../../api/prouction'
     import localCache from "../../util/localCache";
+    import DispatchDialog from '../../components/DispatchDialog/DispatchDialog'
     export default {
         name: "spec",
+        components:{
+            DispatchDialog
+        },
         data() {
             return {
                 addDialogVisiable: false,
@@ -168,6 +175,9 @@
                     }
                 }).catch(() => {
                 })
+            },
+            dispatchHandler(){
+                this.$refs.dispatchDialog.open()
             }
         }
     }

@@ -5,6 +5,8 @@
         <el-button  slot="append"  type="primary" icon="el-icon-search" @click="getList">搜索</el-button>
       </el-input>
       <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加工艺')" title="添加工艺" @click="addHandler"></i>
+      <i class="el-icon-share l-add-buttion" v-if="authedCheck('工艺信息同步')" title="工艺信息同步"
+         @click="dispatchHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column prop="technologyId" label="工艺编号" width="100"></el-table-column>
@@ -40,6 +42,7 @@
         <el-button type="primary" @click="addConfirm">确 定</el-button>
       </div>
     </el-dialog>
+      <DispatchDialog ref="dispatchDialog" :dispatchType="5"></DispatchDialog>
   </div>
 </template>
 
@@ -47,8 +50,12 @@
     import { addTechnology,updateTechnology,getTechnologyList } from '../../api/technology'
     import { getProductionList } from '../../api/prouction'
     import localCache from "../../util/localCache";
+    import DispatchDialog from '../../components/DispatchDialog/DispatchDialog'
 export default {
   name: "technology",
+    components:{
+        DispatchDialog
+    },
   data() {
     return {
       addDialogVisiable: false,
@@ -166,6 +173,9 @@ export default {
               }
           }).catch(() => {
           })
+      },
+      dispatchHandler(){
+          this.$refs.dispatchDialog.open()
       }
   }
 }

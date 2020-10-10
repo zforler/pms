@@ -4,6 +4,8 @@
       <div class="t-top-bar">
         <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加批次')" title="添加批次"
            @click="addHandler"></i>
+          <i class="el-icon-share l-add-buttion" v-if="authedCheck('批次信息同步')" title="批次信息同步"
+             @click="dispatchHandler"></i>
       </div>
       <el-table :data="tableData" border style="width: 100%" v-loading="listLoading"
                 ref="singleTable"  highlight-current-row @current-change="handleCurrentChange">
@@ -94,6 +96,7 @@
               <el-button type="primary" @click="addItemConfirm">确 定</el-button>
           </div>
       </el-dialog>
+      <DispatchDialog ref="dispatchDialog" :dispatchType="2"></DispatchDialog>
   </div>
 </template>
 
@@ -101,10 +104,12 @@
     import Pagination from '@/components/Pagination';
     import { addBatch,updateBatch,getBatchList,getBatchItemPageList,addBatchItem,updateBatchItem } from '../../api/batch'
     import localCache from "../../util/localCache";
+    import DispatchDialog from '../../components/DispatchDialog/DispatchDialog'
 export default {
   name: "batch",
     components: {
         Pagination,
+        DispatchDialog
     },
   data() {
     return {
@@ -309,6 +314,9 @@ export default {
                   })
               }
           });
+      },
+      dispatchHandler(){
+          this.$refs.dispatchDialog.open()
       }
   }
 }

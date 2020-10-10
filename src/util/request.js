@@ -14,15 +14,21 @@ import qs from 'qs'
 //   }
 //   document.body.appendChild(iframe)
 // }
-
+let requestList = new Set() // 存储请求url
 // create an axios instance
 const service = axios.create({
     baseURL: process.env.VUE_APP_BASE_API, // api的base_url
     timeout: 5000 // request timeout
 })
-console.log(process.env.VUE_APP_BASE_API)
+
 // request interceptor
 service.interceptors.request.use(config => {
+    // 利用cancelToken 取消当次请求
+    config.cancelToken = new axios.CancelToken(e => {
+        // 在这里阻止重复请求，上个请求未完成时，相同的请求不会再次执行
+        requestList.has(config.url) ? e(`${location.host}${config.url}---重复请求被中断`) : requestList.add(config.url)
+    })
+
     // 让每个请求携带token-- ['X-Token']为自定义key 请根据实际情况自行修改
     config.headers['x-token'] = localCache.getToken()
     // 以表单的形式提交数据
@@ -40,12 +46,17 @@ service.interceptors.request.use(config => {
     }
     return config
 }, error => {
+    console.log(error)
     Promise.reject(error)
 })
 
 // respone interceptor
 service.interceptors.response.use(
     response => {
+        // 相同请求不得在600毫秒内重复发送，反之继续执行
+        setTimeout(() => {
+            requestList.delete(response.config.url)
+        }, 1000)
         /**
          * 下面的注释为通过response自定义code来标示请求状态，当code返回如下情况为权限有问题，登出并返回到登录页
          * 如通过xmlhttprequest 状态码标识 逻辑可写在下面error中
@@ -113,6 +124,11 @@ service.interceptors.response.use(
         }
     },
     error => {
+        // 请求如果失败了，务必从列表里面删掉，否则请求拦截器会取消请求
+        if(requestList.has(error.config.url)){
+            requestList.delete(error.config.url)
+        }
+
         Message({
             message: error.message,
             type: 'error',

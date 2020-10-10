@@ -49,3 +49,12 @@ export function getSubEquipmentListAll(params={}) {
         params
     })
 }
+
+export function dispatch(params={}) {
+    params.token = localCache.getToken()
+    return request({
+        url: '/access/dispatch',
+        method: 'get',
+        params
+    })
+}

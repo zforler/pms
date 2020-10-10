@@ -31,6 +31,8 @@
         </el-upload>
         <i class="el-icon-circle-plus-outline l-add-buttion" v-if="authedCheck('添加员工')" title="添加员工"
            @click="addHandler"></i>
+        <i class="el-icon-share l-add-buttion" v-if="authedCheck('全部员工信息同步')" title="全部员工信息同步"
+           @click="dispatchHandler"></i>
     </div>
     <el-table :data="tableData" border style="width: 100%" v-loading="listLoading">
       <el-table-column prop="staffNo" label="员工编号" width="150"></el-table-column>
@@ -76,6 +78,8 @@
                @click="unBindCardHandler(scope.row)"></i>
           <i class="el-icon-bank-card el-icon-table" v-if="authedCheck('解绑IC卡')" title="解绑IC卡"
              @click="bindCardHandler(scope.row)"></i>
+            <i class="el-icon-share el-icon-table" v-if="authedCheck('单个员工信息同步')" title="单个员工信息同步"
+               @click="dispatchOnceHandler(scope.row)"></i>
         </template>
       </el-table-column>
     </el-table>
@@ -185,7 +189,7 @@
               <el-button type="primary" @click="bindConfirm">确 定</el-button>
           </div>
       </el-dialog>
-
+      <DispatchDialog ref="dispatchDialog" :dispatchType="dispatchType"></DispatchDialog>
   </div>
 </template>
 
@@ -195,10 +199,12 @@
     import { getDepartmentList } from '../../api/department'
     import { getUnbindStaffCardList,getUnbindCardPageList,getBindCardList } from '../../api/card'
     import localCache from "../../util/localCache";
+    import DispatchDialog from '../../components/DispatchDialog/DispatchDialog'
 export default {
 name: "staff",
   components: {
-    Pagination
+    Pagination,
+    DispatchDialog
   },
   data() {
     return {
@@ -279,7 +285,8 @@ name: "staff",
         uploadParam:{
           type: 1,
         },
-        uploadLoading: ''
+        uploadLoading: '',
+        dispatchType:1
     }
   },
     mounted(){
@@ -549,6 +556,17 @@ name: "staff",
               spinner: 'el-icon-loading',
               background: 'rgba(0, 0, 0, 0.7)'
           });
+      },
+      dispatchHandler(){
+          this.dispatchType = 1
+          this.$refs.dispatchDialog.open()
+      },
+      dispatchOnceHandler(row){
+          this.dispatchType = 6
+          this.$refs.dispatchDialog.open({
+              staffIds: row.staffId
+          })
+
       }
   }
 }
