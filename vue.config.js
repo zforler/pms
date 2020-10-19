@@ -1,4 +1,7 @@
 const path = require('path');
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
+const productionGzipExtensions = ['js', 'css']
+
 function resolve (dir) {
     return path.join(__dirname, dir)
 }
@@ -26,6 +29,22 @@ module.exports = {
                 // name: './img/[name].[hash:8].[ext]'
                 name: './img/[name].[ext]'
             })
+        if(process.env.NODE_ENV=='production'){
+            config.plugin('CompressionWebpackPlugin').use(CompressionWebpackPlugin,[
+                {
+                    algorithm: 'gzip',
+                    test: new RegExp('\\.(' +  ['js', 'css'].join('|') + ')$'),
+                    threshold: 10240,
+                    minRatio: 0.8
+                }])
+        }
+
+        // config.externals(
+        //    {
+        //     vue: 'Vue',
+        //     'vue-router': 'VueRouter'
+        //     }
+        // )
     },
     devServer: {
         // 配置代理

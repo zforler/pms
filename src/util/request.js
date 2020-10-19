@@ -124,8 +124,9 @@ service.interceptors.response.use(
         }
     },
     error => {
+        console.log('request distinct:',error)
         // 请求如果失败了，务必从列表里面删掉，否则请求拦截器会取消请求
-        if(requestList.has(error.config.url)){
+        if(requestList.has(error.config && error.config.url)){
             requestList.delete(error.config.url)
         }
 
