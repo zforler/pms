@@ -29,7 +29,7 @@
     "compression-webpack-plugin": "^6.0.3",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
-    "qs": "^6.9.4",
+    "qs": "^6.9.7",
     "svg-sprite-loader": "^5.0.0",
     "vue-template-compiler": "^2.6.11",
     "webpack-chain": "^6.5.1",
